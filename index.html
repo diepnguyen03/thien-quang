@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xốp Thiên Quang — Báo cáo Khách hàng &amp; Tồn kho (Demo)</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.47.0/tabler-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+:root{
+  --navy:#0F2A3D; --teal:#0E8C7B; --orange:#F0801E; --orange-deep:#D96C0E;
+  --bg-primary:#FFFFFF; --bg-secondary:#F0F3F8;
+  --bg-danger:#FCEAEA; --bg-warning:#FBF1DD; --bg-success:#E8F6EE; --bg-info:#E9F2FC;
+  --border-t:#E2E7F0; --border-s:#CCD5E2; --border-info:#A9CBF0;
+  --tx-primary:#1A2230; --tx-secondary:#5A6678; --tx-tertiary:#8A95A8;
+  --tx-info:#2F6FE0; --tx-success:#1E9E57; --tx-danger:#E24B4A; --tx-warning:#D98200;
+  --tx-teal:#0E8C7B;
+  --r-md:8px; --r-lg:12px;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#F4F6FA;color:var(--tx-primary);font-family:'Inter',-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px}
+::-webkit-scrollbar{width:7px;height:7px}
+::-webkit-scrollbar-track{background:rgba(0,0,0,0.04)}
+::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.18);border-radius:4px}
+
+.layout{display:flex;min-height:100vh}
+
+/* Sidebar */
+.sidebar{width:238px;flex-shrink:0;background:#fff;border-right:0.5px solid var(--border-t);padding:18px 14px;position:sticky;top:0;height:100vh;overflow:auto}
+.brand{display:flex;align-items:center;gap:11px;padding:4px 6px 16px}
+.brand .logo{width:40px;height:40px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;flex-shrink:0;overflow:hidden;border:0.5px solid var(--border-t)}
+.brand .logo img{width:100%;height:100%;object-fit:contain}
+.brand .nm{font-weight:700;font-size:14px;letter-spacing:.2px;line-height:1.25}
+.brand .sub{font-size:9.5px;color:var(--tx-tertiary);letter-spacing:.4px;margin-top:1px}
+.nav{display:flex;flex-direction:column;gap:3px;margin-top:6px}
+.nav button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;padding:10px 11px;border:none;background:transparent;border-radius:var(--r-md);color:var(--tx-secondary);font-size:12.5px;cursor:pointer;font-family:inherit}
+.nav button i{font-size:17px}
+.nav button:hover{background:var(--bg-secondary)}
+.nav button.on{background:var(--bg-warning);color:var(--orange-deep);font-weight:600}
+.sidefilter{margin-top:16px;border-top:0.5px solid var(--border-t);padding-top:14px}
+.sftitle{font-size:10px;font-weight:600;color:var(--tx-tertiary);text-transform:uppercase;letter-spacing:.6px;padding:0 8px 10px;display:flex;align-items:center;gap:6px}
+.filterbar{display:flex;flex-direction:column;gap:11px;padding:0 8px}
+.fitem{display:flex;flex-direction:column;gap:5px;min-width:0}
+.flabel{font-size:10px;font-weight:600;color:var(--tx-tertiary);text-transform:uppercase;letter-spacing:.4px}
+.fsel,.fdate{font-size:12px;font-family:inherit;width:100%;background:var(--bg-secondary);border:0.5px solid var(--border-s);border-radius:var(--r-md);padding:8px 9px;color:var(--tx-primary);cursor:pointer;outline:none}
+.fsel:focus{border-color:var(--teal)}
+.fdrow{display:flex;gap:6px}.fdrow .fitem{flex:1;min-width:0}
+.freset{font-size:11.5px;color:var(--tx-teal);cursor:pointer;background:none;border:none;font-family:inherit;display:flex;align-items:center;gap:6px;padding:6px 2px;margin-top:2px}
+.freset:hover{text-decoration:underline}
+.sidenote{margin-top:16px;border-top:0.5px solid var(--border-t);padding:14px 8px 4px;font-size:10.5px;color:var(--tx-tertiary);line-height:1.5}
+
+/* Main */
+.main{flex:1;padding:22px 26px;max-width:1500px;min-width:0}
+.page{display:none}
+.titlebar{display:flex;align-items:center;justify-content:space-between;margin:0 0 16px;flex-wrap:wrap;gap:10px}
+.titlebar .t{font-size:19px;font-weight:700;color:var(--navy)}
+.titlebar .sub{font-size:11px;color:var(--tx-tertiary)}
+.frange{font-size:12px;color:var(--tx-secondary);display:flex;align-items:center;gap:5px}
+.demo-badge{font-size:10px;font-weight:700;background:var(--bg-warning);color:var(--orange-deep);padding:3px 9px;border-radius:999px;letter-spacing:.3px}
+
+/* KPI */
+.kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:12px;margin-bottom:14px}
+.kpi{background:var(--bg-primary);border:0.5px solid var(--border-t);border-radius:var(--r-lg);padding:14px 15px;position:relative}
+.kpi .chg{position:absolute;top:12px;right:13px;font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:999px;display:inline-flex;align-items:center;gap:3px}
+.kpi .chg.u{color:var(--tx-success);background:var(--bg-success)}
+.kpi .chg.d{color:var(--tx-danger);background:var(--bg-danger)}
+.kpi .ic{width:34px;height:34px;border-radius:9px;background:var(--bg-warning);color:var(--orange-deep);display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:9px}
+.kpi .ttl{font-size:10.5px;font-weight:600;color:var(--tx-secondary);text-transform:uppercase;letter-spacing:.4px}
+.kpi .big{font-size:22px;font-weight:600;margin:5px 0 3px;color:var(--navy)}
+.kpi .big small{font-size:12px;font-weight:400;color:var(--tx-tertiary)}
+.kpi .subtxt{font-size:11px;color:var(--tx-secondary)}
+
+/* Card */
+.card{background:var(--bg-primary);border:0.5px solid var(--border-t);border-radius:var(--r-lg);padding:15px 17px}
+.hd{font-size:13px;font-weight:600;margin:0 0 13px;display:flex;align-items:center;gap:7px;color:var(--navy)}
+.hd i{color:var(--orange-deep);font-size:16px}
+.grid-2{display:grid;grid-template-columns:repeat(auto-fit,minmax(360px,1fr));gap:14px;margin-bottom:14px}
+.grid-3{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-bottom:14px}
+.chart-box{position:relative;width:100%;height:250px}
+.chart-box.sm{height:210px}
+.chart-box.lg{height:320px}
+
+/* legend */
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-bottom:8px;font-size:11.5px;color:var(--tx-secondary)}
+.legend span{display:flex;align-items:center;gap:5px}
+.dot{width:10px;height:10px;border-radius:2px;display:inline-block}
+
+/* tabs */
+.tab{font-size:11.5px;padding:6px 12px;border-radius:var(--r-md);border:0.5px solid var(--border-s);background:transparent;color:var(--tx-secondary);cursor:pointer;font-family:inherit}
+.tab.on{background:var(--bg-warning);color:var(--orange-deep);border-color:#E0AA4E}
+
+/* donut legend row */
+.donut-row{display:flex;align-items:center;gap:20px;flex-wrap:wrap;justify-content:center}
+.donut-holder{position:relative;flex-shrink:0}
+.donut-holder canvas{position:absolute;top:0;left:0}
+.donut-center{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);text-align:center;pointer-events:none}
+.donut-center b{display:block;font-size:14px;font-weight:700;color:var(--navy)}
+.donut-center span{font-size:9px;color:var(--tx-tertiary)}
+.legend-list{display:flex;flex-direction:column;gap:9px;min-width:0}
+.legend-list .li{display:flex;align-items:center;gap:8px;font-size:11.5px}
+.legend-list .li .txt{color:var(--tx-secondary)}
+.legend-list .li .num{margin-left:auto;font-weight:600;color:var(--tx-primary);white-space:nowrap;font-variant-numeric:tabular-nums;padding-left:10px}
+
+/* tables */
+table.rk{width:100%;border-collapse:collapse;font-size:11.8px}
+table.rk th{text-align:right;font-weight:600;color:var(--tx-secondary);padding:8px 9px;font-size:10.5px;text-transform:uppercase;letter-spacing:.3px;position:sticky;top:0;background:var(--bg-secondary);z-index:1}
+table.rk th:first-child{text-align:left}
+table.rk td{padding:9px 9px;border-top:0.5px solid var(--border-t);text-align:right;vertical-align:middle}
+table.rk td:first-child{text-align:left}
+table.rk tr.tot td{border-top:1.5px solid var(--border-s);font-weight:700;background:var(--bg-secondary)}
+.mono{font-variant-numeric:tabular-nums}
+.s2{font-size:11px;color:var(--tx-tertiary)}
+.up{color:var(--tx-success)}.dn{color:var(--tx-danger)}
+.prow{cursor:pointer}
+.prow:hover td{background:#F7F9FC}
+.caret{color:var(--tx-tertiary);font-size:10px;width:11px;display:inline-block}
+.subrow{background:#FAFBFC}
+.subrow td{color:var(--tx-secondary);font-size:11px}
+
+/* pill / status */
+.pill{font-size:10px;font-weight:600;border-radius:999px;padding:3px 9px;display:inline-flex;align-items:center;gap:5px;white-space:nowrap}
+.pill::before{content:'';width:5px;height:5px;border-radius:50%}
+.pill.ok{background:var(--bg-success);color:var(--tx-success)}.pill.ok::before{background:var(--tx-success)}
+.pill.wait{background:var(--bg-warning);color:var(--tx-warning)}.pill.wait::before{background:var(--tx-warning)}
+.pill.late{background:var(--bg-danger);color:var(--tx-danger)}.pill.late::before{background:var(--tx-danger)}
+.pill.info{background:var(--bg-info);color:var(--tx-info)}.pill.info::before{background:var(--tx-info)}
+.pill.watch{background:var(--bg-warning);color:var(--tx-warning)}.pill.watch::before{background:var(--tx-warning)}
+.pill.urgent{background:var(--bg-danger);color:var(--tx-danger);font-weight:700}.pill.urgent::before{background:var(--tx-danger)}
+.tag{display:inline-block;font-size:10px;padding:2px 8px;border-radius:var(--r-md);white-space:nowrap;font-weight:500;background:var(--bg-secondary);color:var(--tx-secondary)}
+
+/* mini progress bars in cells */
+.mbar{height:6px;border-radius:3px;background:var(--bg-secondary);overflow:hidden;margin-top:3px}
+.mbar>div{height:100%;border-radius:3px}
+.mlabel{font-size:9.5px;color:var(--tx-tertiary)}
+
+/* alert list */
+.alert{display:flex;gap:11px;align-items:flex-start;padding:11px 13px;border-radius:var(--r-md);margin-bottom:9px}
+.alert:last-child{margin-bottom:0}
+.alert i{font-size:18px;margin-top:1px}
+.alert.d{background:var(--bg-danger)}.alert.d i{color:var(--tx-danger)}
+.alert.w{background:var(--bg-warning)}.alert.w i{color:var(--tx-warning)}
+.alert.i{background:var(--bg-info)}.alert.i i{color:var(--tx-info)}
+.alert .at{font-size:12px;font-weight:600;color:var(--tx-primary)}
+.alert .ad{font-size:11px;color:var(--tx-secondary);margin-top:1px}
+.alert-row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:900px){.alert-row{grid-template-columns:1fr}}
+@media(max-width:700px){.layout{flex-direction:column}.sidebar{width:100%;height:auto;position:relative}}
+
+/* inline SVG icon system (replaces external icon font) */
+i.icn{display:inline-flex;align-items:center;justify-content:center;line-height:0;color:inherit}
+i.icn svg{width:1em;height:1em;display:block}
+
+/* search bar (tồn kho) */
+.searchbar{display:flex;align-items:center;gap:8px;background:var(--bg-secondary);border:0.5px solid var(--border-s);border-radius:var(--r-md);padding:8px 12px;margin-bottom:12px;max-width:360px}
+.searchbar i.icn{color:var(--tx-tertiary);font-size:15px;flex-shrink:0}
+.searchbar input{flex:1;border:none;background:transparent;outline:none;font-family:inherit;font-size:12.5px;color:var(--tx-primary)}
+.searchbar input::placeholder{color:var(--tx-tertiary)}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar">
+<div class="brand">
+  <div class="logo"><img src="data:image/png;base64,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" alt="Thiên Quang Group"></div>
+  <div><div class="nm">Xốp Thiên Quang</div><div class="sub">BÁO CÁO KHÁCH HÀNG &amp; TỒN KHO</div></div>
+</div>
+<nav class="nav" id="nav">
+  <button class="on" data-page="dh"><i class="icn" data-icon="invoice"></i> Khách hàng &amp; PO</button>
+  <button data-page="kho"><i class="icn" data-icon="warehouse"></i> Tồn kho &amp; Sản xuất</button>
+</nav>
+<div class="sidefilter">
+  <div class="sftitle"><i class="icn" data-icon="filter" style="font-size:14px"></i> Bộ lọc</div>
+  <div class="filterbar">
+    <div class="fitem"><span class="flabel">Khách hàng</span>
+      <select class="fsel" id="fKH"><option value="all">Tất cả khách hàng</option></select></div>
+    <div class="fdrow">
+      <div class="fitem"><span class="flabel">Từ ngày (PO)</span><input type="date" class="fdate" id="fFrom" value="2026-01-01"></div>
+      <div class="fitem"><span class="flabel">Đến ngày (PO)</span><input type="date" class="fdate" id="fTo" value="2026-08-31"></div>
+    </div>
+    <button class="freset" id="fReset"><i class="icn" data-icon="rotate"></i> Đặt lại bộ lọc</button>
+  </div>
+</div>
+<div class="sidenote">Đây là báo cáo <b>demo</b>. Tồn kho Pioneer &amp; đơn hàng Bumjin lấy khung từ hồ sơ thực tế; đơn giá Pioneer, các khách hàng khác và tiến độ giao hàng là số liệu minh họa.</div>
+</aside>
+
+<main class="main">
+<!-- ============ TRANG 1: KHÁCH HÀNG & PO ============ -->
+<section class="page" id="page-dh" style="display:block">
+  <div class="titlebar">
+    <div><span class="t">Khách hàng &amp; Đơn hàng (PO)</span> <span class="sub">· Sản lượng &amp; doanh thu theo PO · ĐVT: chiếc (pcs) · USD</span> <span class="demo-badge">DEMO</span></div>
+    <span class="frange"><i class="icn" data-icon="calendar"></i> 01/2026 → 08/2026</span>
+  </div>
+
+  <div class="kpi-grid" id="dhKpi"></div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="hd"><i class="icn" data-icon="chart-donut"></i> Cơ cấu doanh thu theo khách hàng</div>
+      <div class="donut-row" style="flex:1">
+        <div class="donut-holder" style="width:148px;height:148px">
+          <canvas id="dhRevDonut" style="width:148px!important;height:148px!important"></canvas>
+          <div class="donut-center"><b id="dhRevTotal"></b><span>USD</span></div>
+        </div>
+        <div class="legend-list" id="dhRevLeg" style="flex:1;max-width:230px"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="hd"><i class="icn" data-icon="chart-donut"></i> Cơ cấu sản lượng theo khách hàng</div>
+      <div class="donut-row" style="flex:1">
+        <div class="donut-holder" style="width:148px;height:148px">
+          <canvas id="dhQtyDonut" style="width:148px!important;height:148px!important"></canvas>
+          <div class="donut-center"><b id="dhQtyTotal"></b><span>pcs</span></div>
+        </div>
+        <div class="legend-list" id="dhQtyLeg" style="flex:1;max-width:230px"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <div class="hd" style="justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <span><i class="icn" data-icon="chart-bar"></i> Sản lượng &amp; doanh thu theo tháng</span>
+      <div style="display:flex;gap:6px"><button class="tab dh-cum on" data-v="month">Theo tháng</button><button class="tab dh-cum" data-v="cumu">Lũy kế</button></div>
+    </div>
+    <div class="legend">
+      <span><span class="dot" style="background:#0F2A3D"></span>Sản lượng (pcs)</span>
+      <span><span class="dot" style="background:#F0801E;height:3px;width:16px"></span>Doanh thu (USD)</span>
+    </div>
+    <div class="chart-box lg"><canvas id="dhMonth"></canvas></div>
+  </div>
+
+  <div class="card">
+    <div class="hd" style="justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <span><i class="icn" data-icon="list-details"></i> Chi tiết đơn hàng (PO) <span class="s2" style="font-weight:400">· bấm vào dòng để xem chi tiết mặt hàng</span></span>
+      <div style="display:flex;gap:6px">
+        <button class="tab dh-tab on" data-k="all">Tất cả</button>
+        <button class="tab dh-tab" data-k="ok">Đã giao đủ</button>
+        <button class="tab dh-tab" data-k="wait">Đang xử lý/SX</button>
+        <button class="tab dh-tab" data-k="late">Chậm tiến độ</button>
+      </div>
+    </div>
+    <div style="max-height:560px;overflow:auto"><table class="rk" style="min-width:920px"><thead><tr>
+      <th style="width:30px"></th><th>Số PO</th><th>Khách hàng</th><th>Ngày PO</th>
+      <th>Số mặt hàng</th><th>Sản lượng</th><th>Giá trị (USD)</th><th>Ngày giao</th><th style="width:130px">Trạng thái</th>
+    </tr></thead><tbody id="dhPoBody"></tbody></table></div>
+    <div class="s2" style="margin-top:8px">Trạng thái: <b>Đã giao đủ</b> = tiến độ giao 100% đúng hẹn · <b>Đang xử lý/SX</b> = đang trong kế hoạch sản xuất/giao hàng · <b>Chậm tiến độ</b> = đã quá ngày giao hẹn nhưng chưa giao đủ.</div>
+  </div>
+</section>
+<!-- ============ TRANG 2: TỒN KHO & SẢN XUẤT ============ -->
+<section class="page" id="page-kho">
+  <div class="titlebar">
+    <div><span class="t">Tồn kho &amp; Kế hoạch sản xuất</span> <span class="sub">· So với nhu cầu từ các PO đã xác nhận · ĐVT: chiếc (pcs)</span> <span class="demo-badge">DEMO</span></div>
+    <span class="frange"><i class="icn" data-icon="calendar"></i> Cập nhật 17/08/2026</span>
+  </div>
+
+  <div class="kpi-grid" id="khoKpi"></div>
+
+  <div class="card" style="margin-bottom:14px">
+    <div class="hd"><i class="icn" data-icon="chart-bar"></i> Top 10 sản phẩm thiếu nhiều nhất <span class="s2" style="font-weight:400">· so với nhu cầu từ PO đã xác nhận</span></div>
+    <div class="chart-box lg"><canvas id="khoTop10"></canvas></div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <div class="hd" style="justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <span><i class="icn" data-icon="invoice"></i> Chi tiết PO &amp; sản phẩm thiếu hàng <span class="s2" style="font-weight:400">· các PO chưa hoàn tất giao hàng</span></span>
+      <div style="display:flex;gap:6px">
+        <button class="tab khopo-tab on" data-k="all">Tất cả</button>
+        <button class="tab khopo-tab" data-k="short">Thiếu hàng</button>
+        <button class="tab khopo-tab" data-k="ok">Đủ hàng</button>
+      </div>
+    </div>
+    <div style="max-height:480px;overflow:auto"><table class="rk" style="min-width:920px"><thead><tr>
+      <th style="text-align:left">Số PO</th><th>Khách hàng</th><th style="text-align:left">Mã hàng</th>
+      <th>Ngày xác nhận</th><th>Ngày giao hàng</th><th>Số lượng đặt</th><th>Thiếu</th><th style="width:110px">Trạng thái</th>
+    </tr></thead><tbody id="khoPoBody"></tbody></table></div>
+    <div class="s2" style="margin-top:8px">Ngày xác nhận = ngày PO · Thiếu = phần số lượng của dòng hàng trong PO chưa đủ tồn kho để đáp ứng, phân bổ theo tỷ trọng trong tổng nhu cầu của mã hàng đó.</div>
+  </div>
+
+  <div class="card">
+    <div class="hd" style="justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <span><i class="icn" data-icon="list-details"></i> Chi tiết tồn kho theo mã hàng</span>
+      <div style="display:flex;gap:6px">
+        <button class="tab kho-tab on" data-k="all">Tất cả</button>
+        <button class="tab kho-tab" data-k="ok">Đủ hàng</button>
+        <button class="tab kho-tab" data-k="watch">Cần theo dõi</button>
+        <button class="tab kho-tab" data-k="urgent">Thiếu gấp</button>
+      </div>
+    </div>
+    <div class="searchbar">
+      <i class="icn" data-icon="search"></i>
+      <input type="text" id="khoSearch" placeholder="Tìm theo mã hàng hoặc tên sản phẩm…">
+    </div>
+    <div style="max-height:560px;overflow:auto"><table class="rk" style="min-width:760px"><thead><tr>
+      <th style="text-align:left">Mã hàng</th><th>Tồn kho</th><th>Cần cho PO xác nhận</th>
+      <th>Thiếu</th><th>Cần sản xuất thêm</th><th style="width:120px">Trạng thái</th>
+    </tr></thead><tbody id="khoBody"></tbody></table></div>
+    <div class="s2" style="margin-top:8px">Tồn kho theo dõi theo <b>mã hàng</b> chung cho toàn hệ thống · Cần cho PO xác nhận = tổng số lượng còn phải giao trong tất cả PO chưa hoàn tất (mọi khách hàng) đặt mã hàng đó · Thiếu = Cần − Tồn kho (nếu &gt;0) · Cần sản xuất thêm = Thiếu + 5% dự phòng.</div>
+  </div>
+</section>
+
+<div class="s2" style="margin-top:18px;padding-top:12px;border-top:0.5px solid var(--border-t)">
+  Nguồn: tồn kho &amp; nhu cầu Pioneer lấy từ kế hoạch sản xuất thực tế ngày 21.07.2026; đơn hàng Bumjin (PO 4600044303) lấy từ PO mẫu thực tế. Đơn giá Pioneer, dữ liệu LG Innotek/Samkwang/Foxlink và lịch sử PO theo tháng là số liệu minh họa cho mục đích demo, chưa phản ánh số liệu kinh doanh thật của Thiên Quang.
+</div>
+</main>
+</div>
+<script>
+const RAW = {"customers": [{"id": "kh1", "name": "Bumjin Electronics Vina", "short": "Bumjin", "seg": "Điện tử"}, {"id": "kh2", "name": "Pioneer Vina", "short": "Pioneer", "seg": "Điện tử"}, {"id": "kh3", "name": "LG Innotek Hải Phòng", "short": "LG Innotek", "seg": "Điện tử"}, {"id": "kh4", "name": "Samkwang Vina", "short": "Samkwang", "seg": "Cơ khí/Phụ kiện"}, {"id": "kh5", "name": "Foxlink Precision VN", "short": "Foxlink", "seg": "Điện tử"}], "pos": [{"id": "8800012103", "khid": "kh2", "date": "2026-01-03", "deliv": "2026-01-21", "items": [{"code": "TEC2388-B/VI", "desc": "EPS CUSHION TOP - B", "qty": 474, "price": 0.33}, {"code": "JKEC1009-A/VI", "desc": "EPS LÓT MÀN HÌNH - A", "qty": 740, "price": 0.27}, {"code": "TEC2471-C/VI", "desc": "EPS TRAY MODULE - C", "qty": 253, "price": 0.26}], "qty": 1467, "amt": 422.0, "progress": 90, "late": true, "month": 1}, {"id": "5300019085", "khid": "kh5", "date": "2026-01-05", "deliv": "2026-01-30", "items": [{"code": "FXP-EP108", "desc": "EPS LÓT KHAY FPC", "qty": 859, "price": 0.24}, {"code": "FXP-EP101", "desc": "EPS TRAY ĐẦU NỐI CÁP", "qty": 673, "price": 0.41}, {"code": "FXP-EP111", "desc": "EPS PALLET CUỘN CÁP", "qty": 889, "price": 0.2}], "qty": 2421, "amt": 659.89, "progress": 100, "late": false, "month": 1}, {"id": "7200033017", "khid": "kh3", "date": "2026-01-08", "deliv": "2026-01-30", "items": [{"code": "LGI-EP301", "desc": "EPS TRAY CAMERA MODULE", "qty": 1388, "price": 0.52}, {"code": "LGI-EP305", "desc": "EPS CUSHION ỐNG KÍNH", "qty": 899, "price": 0.61}, {"code": "LGI-EP318", "desc": "EPS PALLET LINH KIỆN", "qty": 1572, "price": 0.28}], "qty": 3859, "amt": 1710.31, "progress": 100, "late": false, "month": 1}, {"id": "8800012106", "khid": "kh2", "date": "2026-01-14", "deliv": "2026-02-09", "items": [{"code": "TEC2459-A/VI", "desc": "EPS TRAY BO MẠCH - A", "qty": 1316, "price": 0.24}, {"code": "TEC2471-C/VI", "desc": "EPS TRAY MODULE - C", "qty": 845, "price": 0.26}, {"code": "TEC2543-B/VI", "desc": "EPS PALLET TỔNG - B", "qty": 800, "price": 0.16}, {"code": "TEC2550-B/VI", "desc": "EPS LÓT KHAY - B", "qty": 1049, "price": 0.35}, {"code": "JKEC1008-B/VI", "desc": "EPS CUSHION ĐÁY - B", "qty": 214, "price": 0.55}, {"code": "JKEC1006-A/VI", "desc": "EPS CUSHION GÓC - A2", "qty": 851, "price": 0.31}], "qty": 5075, "amt": 1412.2, "progress": 100, "late": false, "month": 1}, {"id": "7200033032", "khid": "kh3", "date": "2026-01-17", "deliv": "2026-02-16", "items": [{"code": "LGI-EP305", "desc": "EPS CUSHION ỐNG KÍNH", "qty": 593, "price": 0.61}, {"code": "LGI-EP301", "desc": "EPS TRAY CAMERA MODULE", "qty": 1617, "price": 0.52}, {"code": "LGI-EP318", "desc": "EPS PALLET LINH KIỆN", "qty": 1428, "price": 0.28}], "qty": 3638, "amt": 1602.41, "progress": 90, "late": true, "month": 1}, {"id": "4600044283", "khid": "kh1", "date": "2026-01-25", "deliv": "2026-02-20", "items": [{"code": "NMPEE00141A", "desc": "EPS CUSHION TOP", "qty": 233, "price": 0.2287}, {"code": "NMPEE00123A", "desc": "EPS CUSHION RIGHT", "qty": 328, "price": 0.379}, {"code": "NMPEE00122A", "desc": "EPS CUSHION LEFT", "qty": 542, "price": 0.379}, {"code": "NMPEE00156A", "desc": "EPS CUSHION BOTTOM", "qty": 1111, "price": 0.9587}], "qty": 2214, "amt": 1448.13, "progress": 100, "late": false, "month": 1}, {"id": "6100021047", "khid": "kh4", "date": "2026-01-26", "deliv": "2026-02-27", "items": [{"code": "SKV-EP209", "desc": "EPS TRAY BULONG-PHỤ KIỆN", "qty": 358, "price": 0.15}, {"code": "SKV-EP201", "desc": "EPS LÓT KHUNG NHÔM", "qty": 990, "price": 0.3}, {"code": "SKV-EP204", "desc": "EPS CUSHION TẤM ỐP", "qty": 496, "price": 0.27}, {"code": "SKV-EP212", "desc": "EPS LÓT THÙNG CARTON", "qty": 1079, "price": 0.19}], "qty": 2923, "amt": 689.63, "progress": 100, "late": false, "month": 1}, {"id": "6100021054", "khid": "kh4", "date": "2026-02-04", "deliv": "2026-03-01", "items": [{"code": "SKV-EP212", "desc": "EPS LÓT THÙNG CARTON", "qty": 978, "price": 0.19}, {"code": "SKV-EP209", "desc": "EPS TRAY BULONG-PHỤ KIỆN", "qty": 1462, "price": 0.15}, {"code": "SKV-EP201", "desc": "EPS LÓT KHUNG NHÔM", "qty": 341, "price": 0.3}, {"code": "SKV-EP204", "desc": "EPS CUSHION TẤM ỐP", "qty": 547, "price": 0.27}], "qty": 3328, "amt": 655.11, "progress": 100, "late": false, "month": 2}, {"id": "7200033039", "khid": "kh3", "date": "2026-02-05", "deliv": "2026-03-09", "items": [{"code": "LGI-EP318", "desc": "EPS PALLET LINH KIỆN", "qty": 1312, "price": 0.28}, {"code": "LGI-EP312", "desc": "EPS LÓT HỘP CẢM BIẾN", "qty": 977, "price": 0.35}, {"code": "LGI-EP305", "desc": "EPS CUSHION ỐNG KÍNH", "qty": 1486, "price": 0.61}], "qty": 3775, "amt": 1615.77, "progress": 90, "late": true, "month": 2}, {"id": "8800012109", "khid": "kh2", "date": "2026-02-07", "deliv": "2026-02-27", "items": [{"code": "TEC2388-B/VI", "desc": "EPS CUSHION TOP - B", "qty": 1334, "price": 0.33}, {"code": "TEC2466-A/VI", "desc": "EPS LÓT THÙNG - A", "qty": 1351, "price": 0.23}, {"code": "JKEC1006-A/VI", "desc": "EPS CUSHION GÓC - A2", "qty": 308, "price": 0.31}], "qty": 2993, "amt": 846.43, "progress": 100, "late": false, "month": 2}, {"id": "4600044293", "khid": "kh1", "date": "2026-02-13", "deliv": "2026-03-14", "items": [{"code": "NMPEE00108A", "desc": "EPS SNOW CUSHION", "qty": 398, "price": 0.2898}, {"code": "NMPEE00155A", "desc": "EPS CUSHION TOP", "qty": 721, "price": 0.6245}, {"code": "NMPEE00156A", "desc": "EPS CUSHION BOTTOM", "qty": 968, "price": 0.9587}, {"code": "NMPEE00122A", "desc": "EPS CUSHION LEFT", "qty": 464, "price": 0.379}, {"code": "NMPEE00141A", "desc": "EPS CUSHION TOP", "qty": 300, "price": 0.2287}], "qty": 2851, "amt": 1738.09, "progress": 100, "late": false, "month": 2}, {"id": "4600044290", "khid": "kh1", "date": "2026-02-16", "deliv": "2026-03-14", "items": [{"code": "NMPEE00123A", "desc": "EPS CUSHION RIGHT", "qty": 398, "price": 0.379}, {"code": "NMPEE00140A", "desc": "EPS CUSHION RIGHT", "qty": 1049, "price": 0.3207}, {"code": "NMPEE00139A", "desc": "EPS CUSHION LEFT", "qty": 263, "price": 0.3207}], "qty": 1710, "amt": 571.6, "progress": 90, "late": true, "month": 2}, {"id": "5300019088", "khid": "kh5", "date": "2026-02-16", "deliv": "2026-03-15", "items": [{"code": "FXP-EP108", "desc": "EPS LÓT KHAY FPC", "qty": 154, "price": 0.24}, {"code": "FXP-EP111", "desc": "EPS PALLET CUỘN CÁP", "qty": 532, "price": 0.2}, {"code": "FXP-EP104", "desc": "EPS CUSHION GÓC CONNECTOR", "qty": 427, "price": 0.36}, {"code": "FXP-EP101", "desc": "EPS TRAY ĐẦU NỐI CÁP", "qty": 357, "price": 0.41}], "qty": 1470, "amt": 443.45, "progress": 100, "late": false, "month": 2}, {"id": "5300019095", "khid": "kh5", "date": "2026-02-23", "deliv": "2026-03-13", "items": [{"code": "FXP-EP101", "desc": "EPS TRAY ĐẦU NỐI CÁP", "qty": 574, "price": 0.41}, {"code": "FXP-EP111", "desc": "EPS PALLET CUỘN CÁP", "qty": 1344, "price": 0.2}, {"code": "FXP-EP104", "desc": "EPS CUSHION GÓC CONNECTOR", "qty": 1438, "price": 0.36}, {"code": "FXP-EP108", "desc": "EPS LÓT KHAY FPC", "qty": 1165, "price": 0.24}], "qty": 4521, "amt": 1301.42, "progress": 100, "late": false, "month": 2}, {"id": "8800012120", "khid": "kh2", "date": "2026-03-10", "deliv": "2026-04-03", "items": [{"code": "TEC2388-B/VI", "desc": "EPS CUSHION TOP - B", "qty": 1457, "price": 0.33}, {"code": "TEC2450-A/VI", "desc": "EPS CUSHION SIDE - A", "qty": 1466, "price": 0.29}, {"code": "TEC2466-A/VI", "desc": "EPS LÓT THÙNG - A", "qty": 179, "price": 0.23}, {"code": "JKEC1008-B/VI", "desc": "EPS CUSHION ĐÁY - B", "qty": 1029, "price": 0.55}, {"code": "TEC2459-A/VI", "desc": "EPS TRAY BO MẠCH - A", "qty": 948, "price": 0.24}], "qty": 5079, "amt": 1740.59, "progress": 100, "late": false, "month": 3}, {"id": "5300019109", "khid": "kh5", "date": "2026-03-12", "deliv": "2026-04-07", "items": [{"code": "FXP-EP101", "desc": "EPS TRAY ĐẦU NỐI CÁP", "qty": 412, "price": 0.41}, {"code": "FXP-EP104", "desc": "EPS CUSHION GÓC CONNECTOR", "qty": 645, "price": 0.36}, {"code": "FXP-EP111", "desc": "EPS PALLET CUỘN CÁP", "qty": 1174, "price": 0.2}, {"code": "FXP-EP108", "desc": "EPS LÓT KHAY FPC", "qty": 998, "price": 0.24}], "qty": 3229, "amt": 875.44, "progress": 100, "late": false, "month": 3}, {"id": "5300019106", "khid": "kh5", "date": "2026-03-15", "deliv": "2026-04-12", "items": [{"code": "FXP-EP101", "desc": "EPS TRAY ĐẦU NỐI CÁP", "qty": 675, "price": 0.41}, {"code": "FXP-EP111", "desc": "EPS PALLET CUỘN CÁP", "qty": 1763, "price": 0.2}, {"code": "FXP-EP104", "desc": "EPS CUSHION GÓC CONNECTOR", "qty": 1545, "price": 0.36}, {"code": "FXP-EP108", "desc": "EPS LÓT KHAY FPC", "qty": 1109, "price": 0.24}], "qty": 5092, "amt": 1451.71, "progress": 90, "late": true, "month": 3}, {"id": "7200033054", "khid": "kh3", "date": "2026-03-16", "deliv": "2026-04-11", "items": [{"code": "LGI-EP312", "desc": "EPS LÓT HỘP CẢM BIẾN", "qty": 640, "price": 0.35}, {"code": "LGI-EP318", "desc": "EPS PALLET LINH KIỆN", "qty": 953, "price": 0.28}, {"code": "LGI-EP322", "desc": "EPS CUSHION GÓC MODULE", "qty": 405, "price": 0.33}], "qty": 1998, "amt": 624.49, "progress": 100, "late": false, "month": 3}, {"id": "6100021065", "khid": "kh4", "date": "2026-03-17", "deliv": "2026-04-20", "items": [{"code": "SKV-EP212", "desc": "EPS LÓT THÙNG CARTON", "qty": 651, "price": 0.19}, {"code": "SKV-EP209", "desc": "EPS TRAY BULONG-PHỤ KIỆN", "qty": 618, "price": 0.15}, {"code": "SKV-EP204", "desc": "EPS CUSHION TẤM ỐP", "qty": 400, "price": 0.27}, {"code": "SKV-EP201", "desc": "EPS LÓT KHUNG NHÔM", "qty": 520, "price": 0.3}], "qty": 2189, "amt": 480.39, "progress": 100, "late": false, "month": 3}, {"id": "8800012123", "khid": "kh2", "date": "2026-03-19", "deliv": "2026-04-12", "items": [{"code": "JKEC1008-B/VI", "desc": "EPS CUSHION ĐÁY - B", "qty": 667, "price": 0.55}, {"code": "TEC2463-B/VI", "desc": "EPS CUSHION GÓC LỚN - B", "qty": 792, "price": 0.21}, {"code": "JKEC1005-A/VI", "desc": "EPS CUSHION GÓC - A", "qty": 505, "price": 0.31}, {"code": "TEC2388-B/VI", "desc": "EPS CUSHION TOP - B", "qty": 1319, "price": 0.33}, {"code": "TEC2563-B/VI", "desc": "EPS CUSHION GÓC XL - B", "qty": 1108, "price": 0.2}], "qty": 4391, "amt": 1346.59, "progress": 100, "late": false, "month": 3}, {"id": "4600044300", "khid": "kh1", "date": "2026-03-26", "deliv": "2026-04-22", "items": [{"code": "NMPEE00141A", "desc": "EPS CUSHION TOP", "qty": 897, "price": 0.2287}, {"code": "NMPEE00122A", "desc": "EPS CUSHION LEFT", "qty": 575, "price": 0.379}, {"code": "NMPEE00140A", "desc": "EPS CUSHION RIGHT", "qty": 582, "price": 0.3207}], "qty": 2054, "amt": 609.72, "progress": 100, "late": false, "month": 3}, {"id": "4600044310", "khid": "kh1", "date": "2026-04-03", "deliv": "2026-05-01", "items": [{"code": "NMPEE00142A", "desc": "EPS CUSHION BOTTOM", "qty": 1443, "price": 0.6894}, {"code": "NMPEE00122A", "desc": "EPS CUSHION LEFT", "qty": 1095, "price": 0.379}, {"code": "NMPEE00141A", "desc": "EPS CUSHION TOP", "qty": 377, "price": 0.2287}, {"code": "NMPEE00139A", "desc": "EPS CUSHION LEFT", "qty": 372, "price": 0.3207}, {"code": "NMPEE00151A", "desc": "EPS CUSHION TOP", "qty": 1242, "price": 0.2332}, {"code": "NMPEE00155A", "desc": "EPS CUSHION TOP", "qty": 946, "price": 0.6245}], "qty": 5475, "amt": 2495.74, "progress": 90, "late": true, "month": 4}, {"id": "7200033057", "khid": "kh3", "date": "2026-04-06", "deliv": "2026-04-28", "items": [{"code": "LGI-EP318", "desc": "EPS PALLET LINH KIỆN", "qty": 596, "price": 0.28}, {"code": "LGI-EP305", "desc": "EPS CUSHION ỐNG KÍNH", "qty": 503, "price": 0.61}, {"code": "LGI-EP312", "desc": "EPS LÓT HỘP CẢM BIẾN", "qty": 653, "price": 0.35}], "qty": 1752, "amt": 702.26, "progress": 100, "late": false, "month": 4}, {"id": "6100021072", "khid": "kh4", "date": "2026-04-08", "deliv": "2026-05-11", "items": [{"code": "SKV-EP209", "desc": "EPS TRAY BULONG-PHỤ KIỆN", "qty": 338, "price": 0.15}, {"code": "SKV-EP201", "desc": "EPS LÓT KHUNG NHÔM", "qty": 151, "price": 0.3}, {"code": "SKV-EP212", "desc": "EPS LÓT THÙNG CARTON", "qty": 739, "price": 0.19}, {"code": "SKV-EP204", "desc": "EPS CUSHION TẤM ỐP", "qty": 445, "price": 0.27}], "qty": 1673, "amt": 356.56, "progress": 100, "late": false, "month": 4}, {"id": "8800012149", "khid": "kh2", "date": "2026-04-10", "deliv": "2026-04-29", "items": [{"code": "TEC2471-C/VI", "desc": "EPS TRAY MODULE - C", "qty": 783, "price": 0.26}, {"code": "TEC2450-A/VI", "desc": "EPS CUSHION SIDE - A", "qty": 665, "price": 0.29}, {"code": "JKEC1003-B/VI", "desc": "EPS TRAY LOA - B", "qty": 335, "price": 0.38}], "qty": 1783, "amt": 523.73, "progress": 90, "late": true, "month": 4}, {"id": "7200033064", "khid": "kh3", "date": "2026-04-15", "deliv": "2026-05-15", "items": [{"code": "LGI-EP301", "desc": "EPS TRAY CAMERA MODULE", "qty": 617, "price": 0.52}, {"code": "LGI-EP318", "desc": "EPS PALLET LINH KIỆN", "qty": 1225, "price": 0.28}, {"code": "LGI-EP305", "desc": "EPS CUSHION ỐNG KÍNH", "qty": 1157, "price": 0.61}, {"code": "LGI-EP322", "desc": "EPS CUSHION GÓC MODULE", "qty": 797, "price": 0.33}, {"code": "LGI-EP312", "desc": "EPS LÓT HỘP CẢM BIẾN", "qty": 1034, "price": 0.35}], "qty": 4830, "amt": 1994.52, "progress": 100, "late": false, "month": 4}, {"id": "8800012164", "khid": "kh2", "date": "2026-04-19", "deliv": "2026-05-07", "items": [{"code": "JKEC1005-A/VI", "desc": "EPS CUSHION GÓC - A", "qty": 447, "price": 0.31}, {"code": "JKEC1008-B/VI", "desc": "EPS CUSHION ĐÁY - B", "qty": 615, "price": 0.55}, {"code": "TEC2543-B/VI", "desc": "EPS PALLET TỔNG - B", "qty": 503, "price": 0.16}], "qty": 1565, "amt": 557.3, "progress": 100, "late": false, "month": 4}, {"id": "5300019120", "khid": "kh5", "date": "2026-04-19", "deliv": "2026-05-11", "items": [{"code": "FXP-EP111", "desc": "EPS PALLET CUỘN CÁP", "qty": 680, "price": 0.2}, {"code": "FXP-EP108", "desc": "EPS LÓT KHAY FPC", "qty": 834, "price": 0.24}, {"code": "FXP-EP104", "desc": "EPS CUSHION GÓC CONNECTOR", "qty": 753, "price": 0.36}, {"code": "FXP-EP101", "desc": "EPS TRAY ĐẦU NỐI CÁP", "qty": 390, "price": 0.41}], "qty": 2657, "amt": 767.14, "progress": 100, "late": false, "month": 4}, {"id": "4600044303", "khid": "kh1", "date": "2026-04-21", "deliv": "2026-05-14", "items": [{"code": "NMPEE00123A", "desc": "EPS CUSHION RIGHT", "qty": 1511, "price": 0.379}, {"code": "NMPEE00155A", "desc": "EPS CUSHION TOP", "qty": 1345, "price": 0.6245}, {"code": "NMPEE00140A", "desc": "EPS CUSHION RIGHT", "qty": 1599, "price": 0.3207}, {"code": "NMPEE00142A", "desc": "EPS CUSHION BOTTOM", "qty": 1914, "price": 0.6894}], "qty": 6369, "amt": 3244.93, "progress": 100, "late": false, "month": 4}, {"id": "8800012134", "khid": "kh2", "date": "2026-04-23", "deliv": "2026-05-14", "items": [{"code": "TEC2450-A/VI", "desc": "EPS CUSHION SIDE - A", "qty": 856, "price": 0.29}, {"code": "JKEC1006-A/VI", "desc": "EPS CUSHION GÓC - A2", "qty": 989, "price": 0.31}, {"code": "TEC2563-B/VI", "desc": "EPS CUSHION GÓC XL - B", "qty": 382, "price": 0.2}, {"code": "JKEC1008-B/VI", "desc": "EPS CUSHION ĐÁY - B", "qty": 891, "price": 0.55}], "qty": 3118, "amt": 1121.28, "progress": 100, "late": false, "month": 4}, {"id": "8800012190", "khid": "kh2", "date": "2026-05-02", "deliv": "2026-05-25", "items": [{"code": "TEC2471-C/VI", "desc": "EPS TRAY MODULE - C", "qty": 207, "price": 0.26}, {"code": "TEC2388-B/VI", "desc": "EPS CUSHION TOP - B", "qty": 771, "price": 0.33}, {"code": "TEC2450-A/VI", "desc": "EPS CUSHION SIDE - A", "qty": 417, "price": 0.29}, {"code": "JKEC1009-A/VI", "desc": "EPS LÓT MÀN HÌNH - A", "qty": 1355, "price": 0.27}, {"code": "JKEC1006-A/VI", "desc": "EPS CUSHION GÓC - A2", "qty": 613, "price": 0.31}], "qty": 3363, "amt": 985.06, "progress": 100, "late": false, "month": 5}, {"id": "8800012175", "khid": "kh2", "date": "2026-05-03", "deliv": "2026-06-01", "items": [{"code": "TEC2388-B/VI", "desc": "EPS CUSHION TOP - B", "qty": 1713, "price": 0.33}, {"code": "JKEC1006-A/VI", "desc": "EPS CUSHION GÓC - A2", "qty": 2060, "price": 0.31}, {"code": "TEC2463-B/VI", "desc": "EPS CUSHION GÓC LỚN - B", "qty": 702, "price": 0.21}, {"code": "TEC2471-C/VI", "desc": "EPS TRAY MODULE - C", "qty": 556, "price": 0.26}], "qty": 5031, "amt": 1495.87, "progress": 100, "late": false, "month": 5}, {"id": "7200033074", "khid": "kh3", "date": "2026-05-04", "deliv": "2026-06-04", "items": [{"code": "LGI-EP318", "desc": "EPS PALLET LINH KIỆN", "qty": 522, "price": 0.28}, {"code": "LGI-EP305", "desc": "EPS CUSHION ỐNG KÍNH", "qty": 671, "price": 0.61}, {"code": "LGI-EP301", "desc": "EPS TRAY CAMERA MODULE", "qty": 534, "price": 0.52}], "qty": 1727, "amt": 833.15, "progress": 90, "late": true, "month": 5}, {"id": "4600044321", "khid": "kh1", "date": "2026-05-09", "deliv": "2026-05-31", "items": [{"code": "NMPEE00122A", "desc": "EPS CUSHION LEFT", "qty": 957, "price": 0.379}, {"code": "NMPEE00108A", "desc": "EPS SNOW CUSHION", "qty": 324, "price": 0.2898}, {"code": "NMPEE00152A", "desc": "EPS CUSHION BOTTOM", "qty": 885, "price": 0.6553}, {"code": "NMPEE00123A", "desc": "EPS CUSHION RIGHT", "qty": 1971, "price": 0.379}, {"code": "NMPEE00139A", "desc": "EPS CUSHION LEFT", "qty": 1146, "price": 0.3207}, {"code": "NMPEE00156A", "desc": "EPS CUSHION BOTTOM", "qty": 1926, "price": 0.9587}], "qty": 7209, "amt": 3997.53, "progress": 100, "late": false, "month": 5}, {"id": "5300019123", "khid": "kh5", "date": "2026-05-09", "deliv": "2026-05-30", "items": [{"code": "FXP-EP101", "desc": "EPS TRAY ĐẦU NỐI CÁP", "qty": 792, "price": 0.41}, {"code": "FXP-EP108", "desc": "EPS LÓT KHAY FPC", "qty": 1588, "price": 0.24}, {"code": "FXP-EP111", "desc": "EPS PALLET CUỘN CÁP", "qty": 1030, "price": 0.2}, {"code": "FXP-EP104", "desc": "EPS CUSHION GÓC CONNECTOR", "qty": 1159, "price": 0.36}], "qty": 4569, "amt": 1329.08, "progress": 90, "late": true, "month": 5}, {"id": "7200033071", "khid": "kh3", "date": "2026-05-10", "deliv": "2026-06-10", "items": [{"code": "LGI-EP301", "desc": "EPS TRAY CAMERA MODULE", "qty": 1622, "price": 0.52}, {"code": "LGI-EP318", "desc": "EPS PALLET LINH KIỆN", "qty": 1756, "price": 0.28}, {"code": "LGI-EP305", "desc": "EPS CUSHION ỐNG KÍNH", "qty": 1859, "price": 0.61}, {"code": "LGI-EP312", "desc": "EPS LÓT HỘP CẢM BIẾN", "qty": 1105, "price": 0.35}], "qty": 6342, "amt": 2855.86, "progress": 90, "late": true, "month": 5}, {"id": "5300019130", "khid": "kh5", "date": "2026-05-16", "deliv": "2026-06-07", "items": [{"code": "FXP-EP104", "desc": "EPS CUSHION GÓC CONNECTOR", "qty": 1079, "price": 0.36}, {"code": "FXP-EP108", "desc": "EPS LÓT KHAY FPC", "qty": 634, "price": 0.24}, {"code": "FXP-EP101", "desc": "EPS TRAY ĐẦU NỐI CÁP", "qty": 1250, "price": 0.41}, {"code": "FXP-EP111", "desc": "EPS PALLET CUỘN CÁP", "qty": 744, "price": 0.2}], "qty": 3707, "amt": 1201.9, "progress": 100, "late": false, "month": 5}, {"id": "6100021079", "khid": "kh4", "date": "2026-05-22", "deliv": "2026-06-24", "items": [{"code": "SKV-EP201", "desc": "EPS LÓT KHUNG NHÔM", "qty": 786, "price": 0.3}, {"code": "SKV-EP209", "desc": "EPS TRAY BULONG-PHỤ KIỆN", "qty": 427, "price": 0.15}, {"code": "SKV-EP204", "desc": "EPS CUSHION TẤM ỐP", "qty": 240, "price": 0.27}], "qty": 1453, "amt": 364.65, "progress": 90, "late": true, "month": 5}, {"id": "4600044324", "khid": "kh1", "date": "2026-05-23", "deliv": "2026-06-18", "items": [{"code": "NMPEE00122A", "desc": "EPS CUSHION LEFT", "qty": 739, "price": 0.379}, {"code": "NMPEE00142A", "desc": "EPS CUSHION BOTTOM", "qty": 737, "price": 0.6894}, {"code": "NMPEE00140A", "desc": "EPS CUSHION RIGHT", "qty": 959, "price": 0.3207}, {"code": "NMPEE00123A", "desc": "EPS CUSHION RIGHT", "qty": 774, "price": 0.379}, {"code": "NMPEE00141A", "desc": "EPS CUSHION TOP", "qty": 551, "price": 0.2287}], "qty": 3760, "amt": 1515.08, "progress": 100, "late": false, "month": 5}, {"id": "4600044331", "khid": "kh1", "date": "2026-06-06", "deliv": "2026-07-05", "items": [{"code": "NMPEE00156A", "desc": "EPS CUSHION BOTTOM", "qty": 330, "price": 0.9587}, {"code": "NMPEE00152A", "desc": "EPS CUSHION BOTTOM", "qty": 688, "price": 0.6553}, {"code": "NMPEE00108A", "desc": "EPS SNOW CUSHION", "qty": 1574, "price": 0.2898}, {"code": "NMPEE00139A", "desc": "EPS CUSHION LEFT", "qty": 1320, "price": 0.3207}], "qty": 3912, "amt": 1646.69, "progress": 100, "late": false, "month": 6}, {"id": "4600044334", "khid": "kh1", "date": "2026-06-09", "deliv": "2026-06-29", "items": [{"code": "NMPEE00155A", "desc": "EPS CUSHION TOP", "qty": 431, "price": 0.6245}, {"code": "NMPEE00122A", "desc": "EPS CUSHION LEFT", "qty": 1033, "price": 0.379}, {"code": "NMPEE00156A", "desc": "EPS CUSHION BOTTOM", "qty": 1163, "price": 0.9587}], "qty": 2627, "amt": 1775.63, "progress": 100, "late": false, "month": 6}, {"id": "7200033089", "khid": "kh3", "date": "2026-06-10", "deliv": "2026-06-30", "items": [{"code": "LGI-EP301", "desc": "EPS TRAY CAMERA MODULE", "qty": 1447, "price": 0.52}, {"code": "LGI-EP322", "desc": "EPS CUSHION GÓC MODULE", "qty": 1239, "price": 0.33}, {"code": "LGI-EP305", "desc": "EPS CUSHION ỐNG KÍNH", "qty": 1404, "price": 0.61}, {"code": "LGI-EP318", "desc": "EPS PALLET LINH KIỆN", "qty": 1718, "price": 0.28}], "qty": 5808, "amt": 2498.79, "progress": 100, "late": false, "month": 6}, {"id": "6100021082", "khid": "kh4", "date": "2026-06-14", "deliv": "2026-07-17", "items": [{"code": "SKV-EP201", "desc": "EPS LÓT KHUNG NHÔM", "qty": 1911, "price": 0.3}, {"code": "SKV-EP212", "desc": "EPS LÓT THÙNG CARTON", "qty": 366, "price": 0.19}, {"code": "SKV-EP209", "desc": "EPS TRAY BULONG-PHỤ KIỆN", "qty": 658, "price": 0.15}], "qty": 2935, "amt": 741.54, "progress": 90, "late": true, "month": 6}, {"id": "5300019141", "khid": "kh5", "date": "2026-06-20", "deliv": "2026-07-23", "items": [{"code": "FXP-EP111", "desc": "EPS PALLET CUỘN CÁP", "qty": 848, "price": 0.2}, {"code": "FXP-EP108", "desc": "EPS LÓT KHAY FPC", "qty": 838, "price": 0.24}, {"code": "FXP-EP104", "desc": "EPS CUSHION GÓC CONNECTOR", "qty": 726, "price": 0.36}], "qty": 2412, "amt": 632.08, "progress": 100, "late": false, "month": 6}, {"id": "7200033092", "khid": "kh3", "date": "2026-06-21", "deliv": "2026-07-13", "items": [{"code": "LGI-EP305", "desc": "EPS CUSHION ỐNG KÍNH", "qty": 1071, "price": 0.61}, {"code": "LGI-EP318", "desc": "EPS PALLET LINH KIỆN", "qty": 587, "price": 0.28}, {"code": "LGI-EP312", "desc": "EPS LÓT HỘP CẢM BIẾN", "qty": 377, "price": 0.35}], "qty": 2035, "amt": 949.62, "progress": 100, "late": false, "month": 6}, {"id": "8800012193", "khid": "kh2", "date": "2026-06-23", "deliv": "2026-07-17", "items": [{"code": "TEC2462-B/VI", "desc": "EPS PALLET LÓT ĐÁY - B", "qty": 1157, "price": 0.19}, {"code": "TEC2450-A/VI", "desc": "EPS CUSHION SIDE - A", "qty": 1395, "price": 0.29}, {"code": "JKEC1005-A/VI", "desc": "EPS CUSHION GÓC - A", "qty": 653, "price": 0.31}, {"code": "TEC2563-B/VI", "desc": "EPS CUSHION GÓC XL - B", "qty": 213, "price": 0.2}, {"code": "TEC2463-B/VI", "desc": "EPS CUSHION GÓC LỚN - B", "qty": 1443, "price": 0.21}, {"code": "TEC2564-A/VI", "desc": "EPS TRAY LOA LỚN - A", "qty": 552, "price": 0.44}], "qty": 5413, "amt": 1415.32, "progress": 100, "late": false, "month": 6}, {"id": "5300019148", "khid": "kh5", "date": "2026-06-24", "deliv": "2026-07-19", "items": [{"code": "FXP-EP104", "desc": "EPS CUSHION GÓC CONNECTOR", "qty": 1413, "price": 0.36}, {"code": "FXP-EP111", "desc": "EPS PALLET CUỘN CÁP", "qty": 1595, "price": 0.2}, {"code": "FXP-EP101", "desc": "EPS TRAY ĐẦU NỐI CÁP", "qty": 866, "price": 0.41}, {"code": "FXP-EP108", "desc": "EPS LÓT KHAY FPC", "qty": 1342, "price": 0.24}], "qty": 5216, "amt": 1504.82, "progress": 100, "late": false, "month": 6}, {"id": "5300019151", "khid": "kh5", "date": "2026-07-06", "deliv": "2026-08-09", "items": [{"code": "FXP-EP101", "desc": "EPS TRAY ĐẦU NỐI CÁP", "qty": 235, "price": 0.41}, {"code": "FXP-EP104", "desc": "EPS CUSHION GÓC CONNECTOR", "qty": 884, "price": 0.36}, {"code": "FXP-EP111", "desc": "EPS PALLET CUỘN CÁP", "qty": 972, "price": 0.2}, {"code": "FXP-EP108", "desc": "EPS LÓT KHAY FPC", "qty": 173, "price": 0.24}], "qty": 2264, "amt": 650.51, "progress": 85, "late": true, "month": 7}, {"id": "4600044344", "khid": "kh1", "date": "2026-07-09", "deliv": "2026-07-29", "items": [{"code": "NMPEE00139A", "desc": "EPS CUSHION LEFT", "qty": 901, "price": 0.3207}, {"code": "NMPEE00122A", "desc": "EPS CUSHION LEFT", "qty": 381, "price": 0.379}, {"code": "NMPEE00156A", "desc": "EPS CUSHION BOTTOM", "qty": 288, "price": 0.9587}], "qty": 1570, "amt": 709.46, "progress": 60, "late": true, "month": 7}, {"id": "6100021097", "khid": "kh4", "date": "2026-07-16", "deliv": "2026-08-17", "items": [{"code": "SKV-EP212", "desc": "EPS LÓT THÙNG CARTON", "qty": 636, "price": 0.19}, {"code": "SKV-EP204", "desc": "EPS CUSHION TẤM ỐP", "qty": 642, "price": 0.27}, {"code": "SKV-EP201", "desc": "EPS LÓT KHUNG NHÔM", "qty": 1514, "price": 0.3}, {"code": "SKV-EP209", "desc": "EPS TRAY BULONG-PHỤ KIỆN", "qty": 537, "price": 0.15}], "qty": 3329, "amt": 828.93, "progress": 100, "late": false, "month": 7}, {"id": "4600044341", "khid": "kh1", "date": "2026-07-19", "deliv": "2026-08-12", "items": [{"code": "NMPEE00140A", "desc": "EPS CUSHION RIGHT", "qty": 212, "price": 0.3207}, {"code": "NMPEE00139A", "desc": "EPS CUSHION LEFT", "qty": 162, "price": 0.3207}, {"code": "NMPEE00155A", "desc": "EPS CUSHION TOP", "qty": 777, "price": 0.6245}, {"code": "NMPEE00156A", "desc": "EPS CUSHION BOTTOM", "qty": 817, "price": 0.9587}, {"code": "NMPEE00108A", "desc": "EPS SNOW CUSHION", "qty": 146, "price": 0.2898}], "qty": 2114, "amt": 1430.75, "progress": 60, "late": true, "month": 7}, {"id": "8800012196", "khid": "kh2", "date": "2026-07-21", "deliv": "2026-08-21", "items": [{"code": "TEC2462-B/VI", "desc": "EPS PALLET LÓT ĐÁY - B", "qty": 585, "price": 0.19}, {"code": "TEC2471-C/VI", "desc": "EPS TRAY MODULE - C", "qty": 310, "price": 0.26}, {"code": "TEC2560-B/VI", "desc": "EPS CUSHION ĐÁY LỚN - B", "qty": 1049, "price": 0.22}, {"code": "JKEC1006-A/VI", "desc": "EPS CUSHION GÓC - A2", "qty": 1207, "price": 0.31}, {"code": "TEC2466-A/VI", "desc": "EPS LÓT THÙNG - A", "qty": 1748, "price": 0.23}], "qty": 4899, "amt": 1198.74, "progress": 60, "late": false, "month": 7}, {"id": "5300019162", "khid": "kh5", "date": "2026-07-21", "deliv": "2026-08-20", "items": [{"code": "FXP-EP108", "desc": "EPS LÓT KHAY FPC", "qty": 1455, "price": 0.24}, {"code": "FXP-EP111", "desc": "EPS PALLET CUỘN CÁP", "qty": 1962, "price": 0.2}, {"code": "FXP-EP104", "desc": "EPS CUSHION GÓC CONNECTOR", "qty": 1184, "price": 0.36}], "qty": 4601, "amt": 1167.84, "progress": 60, "late": false, "month": 7}, {"id": "7200033095", "khid": "kh3", "date": "2026-07-26", "deliv": "2026-08-18", "items": [{"code": "LGI-EP301", "desc": "EPS TRAY CAMERA MODULE", "qty": 1103, "price": 0.52}, {"code": "LGI-EP322", "desc": "EPS CUSHION GÓC MODULE", "qty": 258, "price": 0.33}, {"code": "LGI-EP305", "desc": "EPS CUSHION ỐNG KÍNH", "qty": 1071, "price": 0.61}, {"code": "LGI-EP312", "desc": "EPS LÓT HỘP CẢM BIẾN", "qty": 987, "price": 0.35}], "qty": 3419, "amt": 1657.46, "progress": 100, "late": false, "month": 7}, {"id": "6100021104", "khid": "kh4", "date": "2026-08-02", "deliv": "2026-09-02", "items": [{"code": "SKV-EP212", "desc": "EPS LÓT THÙNG CARTON", "qty": 482, "price": 0.19}, {"code": "SKV-EP204", "desc": "EPS CUSHION TẤM ỐP", "qty": 1174, "price": 0.27}, {"code": "SKV-EP201", "desc": "EPS LÓT KHUNG NHÔM", "qty": 229, "price": 0.3}, {"code": "SKV-EP209", "desc": "EPS TRAY BULONG-PHỤ KIỆN", "qty": 423, "price": 0.15}], "qty": 2308, "amt": 540.71, "progress": 20, "late": false, "month": 8}, {"id": "5300019165", "khid": "kh5", "date": "2026-08-09", "deliv": "2026-09-05", "items": [{"code": "FXP-EP101", "desc": "EPS TRAY ĐẦU NỐI CÁP", "qty": 1425, "price": 0.41}, {"code": "FXP-EP104", "desc": "EPS CUSHION GÓC CONNECTOR", "qty": 381, "price": 0.36}, {"code": "FXP-EP111", "desc": "EPS PALLET CUỘN CÁP", "qty": 495, "price": 0.2}], "qty": 2301, "amt": 820.41, "progress": 20, "late": false, "month": 8}, {"id": "8800012203", "khid": "kh2", "date": "2026-08-13", "deliv": "2026-09-13", "items": [{"code": "TEC2462-B/VI", "desc": "EPS PALLET LÓT ĐÁY - B", "qty": 708, "price": 0.19}, {"code": "TEC2564-A/VI", "desc": "EPS TRAY LOA LỚN - A", "qty": 723, "price": 0.44}, {"code": "JKEC1006-A/VI", "desc": "EPS CUSHION GÓC - A2", "qty": 890, "price": 0.31}], "qty": 2321, "amt": 728.54, "progress": 0, "late": false, "month": 8}, {"id": "4600044354", "khid": "kh1", "date": "2026-08-14", "deliv": "2026-09-11", "items": [{"code": "NMPEE00141A", "desc": "EPS CUSHION TOP", "qty": 384, "price": 0.2287}, {"code": "NMPEE00152A", "desc": "EPS CUSHION BOTTOM", "qty": 448, "price": 0.6553}, {"code": "NMPEE00151A", "desc": "EPS CUSHION TOP", "qty": 861, "price": 0.2332}], "qty": 1693, "amt": 582.18, "progress": 60, "late": false, "month": 8}, {"id": "8800012229", "khid": "kh2", "date": "2026-08-16", "deliv": "2026-09-17", "items": [{"code": "TEC2560-B/VI", "desc": "EPS CUSHION ĐÁY LỚN - B", "qty": 936, "price": 0.22}, {"code": "TEC2550-B/VI", "desc": "EPS LÓT KHAY - B", "qty": 882, "price": 0.35}, {"code": "JKEC1009-A/VI", "desc": "EPS LÓT MÀN HÌNH - A", "qty": 254, "price": 0.27}, {"code": "JKEC1005-A/VI", "desc": "EPS CUSHION GÓC - A", "qty": 1280, "price": 0.31}], "qty": 3352, "amt": 980.0, "progress": 40, "late": false, "month": 8}, {"id": "4600044351", "khid": "kh1", "date": "2026-08-17", "deliv": "2026-09-17", "items": [{"code": "NMPEE00122A", "desc": "EPS CUSHION LEFT", "qty": 793, "price": 0.379}, {"code": "NMPEE00152A", "desc": "EPS CUSHION BOTTOM", "qty": 1147, "price": 0.6553}, {"code": "NMPEE00140A", "desc": "EPS CUSHION RIGHT", "qty": 1072, "price": 0.3207}, {"code": "NMPEE00139A", "desc": "EPS CUSHION LEFT", "qty": 1492, "price": 0.3207}], "qty": 4504, "amt": 1874.45, "progress": 60, "late": false, "month": 8}, {"id": "8800012214", "khid": "kh2", "date": "2026-08-19", "deliv": "2026-09-10", "items": [{"code": "TEC2471-C/VI", "desc": "EPS TRAY MODULE - C", "qty": 1270, "price": 0.26}, {"code": "TEC2466-A/VI", "desc": "EPS LÓT THÙNG - A", "qty": 564, "price": 0.23}, {"code": "JKEC1009-A/VI", "desc": "EPS LÓT MÀN HÌNH - A", "qty": 439, "price": 0.27}, {"code": "TEC2459-A/VI", "desc": "EPS TRAY BO MẠCH - A", "qty": 1206, "price": 0.24}], "qty": 3479, "amt": 867.89, "progress": 20, "late": false, "month": 8}, {"id": "7200033098", "khid": "kh3", "date": "2026-08-20", "deliv": "2026-09-08", "items": [{"code": "LGI-EP322", "desc": "EPS CUSHION GÓC MODULE", "qty": 731, "price": 0.33}, {"code": "LGI-EP318", "desc": "EPS PALLET LINH KIỆN", "qty": 126, "price": 0.28}, {"code": "LGI-EP312", "desc": "EPS LÓT HỘP CẢM BIẾN", "qty": 514, "price": 0.35}, {"code": "LGI-EP305", "desc": "EPS CUSHION ỐNG KÍNH", "qty": 581, "price": 0.61}], "qty": 1952, "amt": 810.82, "progress": 0, "late": false, "month": 8}, {"id": "7200033109", "khid": "kh3", "date": "2026-08-22", "deliv": "2026-09-23", "items": [{"code": "LGI-EP305", "desc": "EPS CUSHION ỐNG KÍNH", "qty": 1322, "price": 0.61}, {"code": "LGI-EP318", "desc": "EPS PALLET LINH KIỆN", "qty": 996, "price": 0.28}, {"code": "LGI-EP301", "desc": "EPS TRAY CAMERA MODULE", "qty": 618, "price": 0.52}, {"code": "LGI-EP322", "desc": "EPS CUSHION GÓC MODULE", "qty": 510, "price": 0.33}, {"code": "LGI-EP312", "desc": "EPS LÓT HỘP CẢM BIẾN", "qty": 1474, "price": 0.35}], "qty": 4920, "amt": 2090.86, "progress": 20, "late": false, "month": 8}], "inventory": [{"khid": "kh2", "code": "JKEC1002-A/VI", "desc": "EPS TRAY LOA - A", "stock": 282, "need": 288, "shortage": 6, "to_produce": 6, "status": "watch"}, {"khid": "kh2", "code": "JKEC1003-B/VI", "desc": "EPS TRAY LOA - B", "stock": 135, "need": 1062, "shortage": 927, "to_produce": 973, "status": "urgent"}, {"khid": "kh2", "code": "JKEC1005-A/VI", "desc": "EPS CUSHION GÓC - A", "stock": 90, "need": 960, "shortage": 870, "to_produce": 914, "status": "urgent"}, {"khid": "kh2", "code": "JKEC1006-A/VI", "desc": "EPS CUSHION GÓC - A2", "stock": 65, "need": 846, "shortage": 781, "to_produce": 820, "status": "urgent"}, {"khid": "kh2", "code": "JKEC1008-B/VI", "desc": "EPS CUSHION ĐÁY - B", "stock": 347, "need": 432, "shortage": 85, "to_produce": 89, "status": "watch"}, {"khid": "kh2", "code": "JKEC1009-A/VI", "desc": "EPS LÓT MÀN HÌNH - A", "stock": 120, "need": 152, "shortage": 32, "to_produce": 34, "status": "watch"}, {"khid": "kh2", "code": "TEC1703-B/VI", "desc": "EPS TRAY LINH KIỆN - B", "stock": 274, "need": 1104, "shortage": 830, "to_produce": 872, "status": "urgent"}, {"khid": "kh2", "code": "TEC2388-B/VI", "desc": "EPS CUSHION TOP - B", "stock": 464, "need": 1360, "shortage": 896, "to_produce": 941, "status": "urgent"}, {"khid": "kh2", "code": "TEC2450-A/VI", "desc": "EPS CUSHION SIDE - A", "stock": 300, "need": 454, "shortage": 154, "to_produce": 162, "status": "urgent"}, {"khid": "kh2", "code": "TEC2459-A/VI", "desc": "EPS TRAY BO MẠCH - A", "stock": 566, "need": 3580, "shortage": 3014, "to_produce": 3165, "status": "urgent"}, {"khid": "kh2", "code": "TEC2462-B/VI", "desc": "EPS PALLET LÓT ĐÁY - B", "stock": 4168, "need": 15248, "shortage": 11080, "to_produce": 11634, "status": "urgent"}, {"khid": "kh2", "code": "TEC2463-B/VI", "desc": "EPS CUSHION GÓC LỚN - B", "stock": 1967, "need": 8144, "shortage": 6177, "to_produce": 6486, "status": "urgent"}, {"khid": "kh2", "code": "TEC2466-A/VI", "desc": "EPS LÓT THÙNG - A", "stock": 504, "need": 4384, "shortage": 3880, "to_produce": 4074, "status": "urgent"}, {"khid": "kh2", "code": "TEC2471-C/VI", "desc": "EPS TRAY MODULE - C", "stock": 2690, "need": 6700, "shortage": 4010, "to_produce": 4210, "status": "urgent"}, {"khid": "kh2", "code": "TEC2475-A/VI", "desc": "EPS CUSHION TOP LỚN - A", "stock": 504, "need": 15132, "shortage": 14628, "to_produce": 15359, "status": "urgent"}, {"khid": "kh2", "code": "TEC2550-B/VI", "desc": "EPS LÓT KHAY - B", "stock": 122, "need": 1710, "shortage": 1588, "to_produce": 1667, "status": "urgent"}, {"khid": "kh2", "code": "TEC2560-B/VI", "desc": "EPS CUSHION ĐÁY LỚN - B", "stock": 2468, "need": 6140, "shortage": 3672, "to_produce": 3856, "status": "urgent"}, {"khid": "kh2", "code": "TEC2543-B/VI", "desc": "EPS PALLET TỔNG - B", "stock": 9168, "need": 29412, "shortage": 20244, "to_produce": 21256, "status": "urgent"}, {"khid": "kh2", "code": "TEC2563-B/VI", "desc": "EPS CUSHION GÓC XL - B", "stock": 991, "need": 3990, "shortage": 2999, "to_produce": 3149, "status": "urgent"}, {"khid": "kh2", "code": "TEC2564-A/VI", "desc": "EPS TRAY LOA LỚN - A", "stock": 14, "need": 1455, "shortage": 1441, "to_produce": 1513, "status": "urgent"}, {"khid": "kh1", "code": "NMPEE00108A", "desc": "EPS SNOW CUSHION", "stock": 282, "need": 146, "shortage": 0, "to_produce": 0, "status": "ok"}, {"khid": "kh1", "code": "NMPEE00122A", "desc": "EPS CUSHION LEFT", "stock": 1085, "need": 2269, "shortage": 1184, "to_produce": 1243, "status": "urgent"}, {"khid": "kh1", "code": "NMPEE00123A", "desc": "EPS CUSHION RIGHT", "stock": 697, "need": 398, "shortage": 0, "to_produce": 0, "status": "ok"}, {"khid": "kh1", "code": "NMPEE00141A", "desc": "EPS CUSHION TOP", "stock": 683, "need": 761, "shortage": 78, "to_produce": 82, "status": "watch"}, {"khid": "kh1", "code": "NMPEE00142A", "desc": "EPS CUSHION BOTTOM", "stock": 1496, "need": 1443, "shortage": 0, "to_produce": 0, "status": "ok"}, {"khid": "kh1", "code": "NMPEE00139A", "desc": "EPS CUSHION LEFT", "stock": 2065, "need": 3190, "shortage": 1125, "to_produce": 1181, "status": "urgent"}, {"khid": "kh1", "code": "NMPEE00140A", "desc": "EPS CUSHION RIGHT", "stock": 3039, "need": 2333, "shortage": 0, "to_produce": 0, "status": "ok"}, {"khid": "kh1", "code": "NMPEE00155A", "desc": "EPS CUSHION TOP", "stock": 2346, "need": 1723, "shortage": 0, "to_produce": 0, "status": "ok"}, {"khid": "kh1", "code": "NMPEE00156A", "desc": "EPS CUSHION BOTTOM", "stock": 1930, "need": 1105, "shortage": 0, "to_produce": 0, "status": "ok"}, {"khid": "kh1", "code": "NMPEE00151A", "desc": "EPS CUSHION TOP", "stock": 1448, "need": 2103, "shortage": 655, "to_produce": 688, "status": "urgent"}, {"khid": "kh1", "code": "NMPEE00152A", "desc": "EPS CUSHION BOTTOM", "stock": 852, "need": 1595, "shortage": 743, "to_produce": 780, "status": "urgent"}, {"khid": "kh3", "code": "LGI-EP301", "desc": "EPS TRAY CAMERA MODULE", "stock": 8256, "need": 4391, "shortage": 0, "to_produce": 0, "status": "ok"}, {"khid": "kh3", "code": "LGI-EP305", "desc": "EPS CUSHION ỐNG KÍNH", "stock": 9465, "need": 6512, "shortage": 0, "to_produce": 0, "status": "ok"}, {"khid": "kh3", "code": "LGI-EP312", "desc": "EPS LÓT HỘP CẢM BIẾN", "stock": 3294, "need": 4070, "shortage": 776, "to_produce": 815, "status": "watch"}, {"khid": "kh3", "code": "LGI-EP318", "desc": "EPS PALLET LINH KIỆN", "stock": 11984, "need": 6140, "shortage": 0, "to_produce": 0, "status": "ok"}, {"khid": "kh3", "code": "LGI-EP322", "desc": "EPS CUSHION GÓC MODULE", "stock": 798, "need": 1241, "shortage": 443, "to_produce": 465, "status": "urgent"}, {"khid": "kh4", "code": "SKV-EP201", "desc": "EPS LÓT KHUNG NHÔM", "stock": 3464, "need": 2926, "shortage": 0, "to_produce": 0, "status": "ok"}, {"khid": "kh4", "code": "SKV-EP204", "desc": "EPS CUSHION TẤM ỐP", "stock": 1176, "need": 1414, "shortage": 238, "to_produce": 250, "status": "watch"}, {"khid": "kh4", "code": "SKV-EP209", "desc": "EPS TRAY BULONG-PHỤ KIỆN", "stock": 1257, "need": 1508, "shortage": 251, "to_produce": 264, "status": "watch"}, {"khid": "kh4", "code": "SKV-EP212", "desc": "EPS LÓT THÙNG CARTON", "stock": 352, "need": 848, "shortage": 496, "to_produce": 521, "status": "urgent"}, {"khid": "kh5", "code": "FXP-EP101", "desc": "EPS TRAY ĐẦU NỐI CÁP", "stock": 5528, "need": 3127, "shortage": 0, "to_produce": 0, "status": "ok"}, {"khid": "kh5", "code": "FXP-EP104", "desc": "EPS CUSHION GÓC CONNECTOR", "stock": 9955, "need": 5153, "shortage": 0, "to_produce": 0, "status": "ok"}, {"khid": "kh5", "code": "FXP-EP108", "desc": "EPS LÓT KHAY FPC", "stock": 6712, "need": 4325, "shortage": 0, "to_produce": 0, "status": "ok"}, {"khid": "kh5", "code": "FXP-EP111", "desc": "EPS PALLET CUỘN CÁP", "stock": 4159, "need": 6222, "shortage": 2063, "to_produce": 2166, "status": "urgent"}], "months": ["01/2026", "02/2026", "03/2026", "04/2026", "05/2026", "06/2026", "07/2026", "08/2026"]};
+</script>
+<script>
+/* ============ ICONS (inline SVG, no external font dependency) ============ */
+const SVGW='stroke="currentColor" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"';
+const ICON_SVG={
+  'invoice':'<svg viewBox="0 0 24 24" '+SVGW+'><path d="M14 3v4a1 1 0 0 0 1 1h4"/><path d="M17 21H7a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h7l5 5v11a2 2 0 0 1-2 2Z"/><path d="M9 13h6"/><path d="M9 17h6"/></svg>',
+  'warehouse':'<svg viewBox="0 0 24 24" '+SVGW+'><path d="M3 21V10l9-6 9 6v11"/><path d="M3 21h18"/><path d="M9 21v-6h6v6"/></svg>',
+  'package':'<svg viewBox="0 0 24 24" '+SVGW+'><path d="M12 3 3 8v8l9 5 9-5V8Z"/><path d="M3 8l9 5 9-5"/><path d="M12 13v8"/></svg>',
+  'package-off':'<svg viewBox="0 0 24 24" '+SVGW+'><path d="M12 3 3 8v8l9 5 9-5V8Z"/><path d="M3 8l9 5 9-5"/><path d="M12 13v8"/><line x1="4" y1="4" x2="20" y2="20"/></svg>',
+  'cash':'<svg viewBox="0 0 24 24" '+SVGW+'><rect x="2" y="6" width="20" height="12" rx="2"/><circle cx="12" cy="12" r="3"/><path d="M6 9v.01M18 15v.01"/></svg>',
+  'alert-triangle':'<svg viewBox="0 0 24 24" '+SVGW+'><path d="M12 3 2 20h20Z"/><path d="M12 9v5"/><path d="M12 17h.01"/></svg>',
+  'calendar':'<svg viewBox="0 0 24 24" '+SVGW+'><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4M16 3v4"/></svg>',
+  'calendar-due':'<svg viewBox="0 0 24 24" '+SVGW+'><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18"/><path d="M8 3v4M16 3v4"/><path d="M12 14v3"/></svg>',
+  'chart-donut':'<svg viewBox="0 0 24 24" '+SVGW+'><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3a9 9 0 0 1 9 9"/></svg>',
+  'chart-bar':'<svg viewBox="0 0 24 24" '+SVGW+'><path d="M4 20V10"/><path d="M10 20V4"/><path d="M16 20v-7"/><path d="M22 20H2"/></svg>',
+  'list-details':'<svg viewBox="0 0 24 24" '+SVGW+'><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg>',
+  'list':'<svg viewBox="0 0 24 24" '+SVGW+'><path d="M9 6h11M9 12h11M9 18h11"/><path d="M4 6h.01M4 12h.01M4 18h.01"/></svg>',
+  'stack-2':'<svg viewBox="0 0 24 24" '+SVGW+'><path d="M12 3 3 8l9 5 9-5Z"/><path d="M3 13l9 5 9-5"/></svg>',
+  'flame':'<svg viewBox="0 0 24 24" '+SVGW+'><path d="M12 2c1 3-2 4-2 7a4 4 0 0 0 8 0c0-1-.5-2-1-3 1 0 3 2 3 6a6 6 0 0 1-12 0c0-4 2-7 4-10Z"/></svg>',
+  'circle-check':'<svg viewBox="0 0 24 24" '+SVGW+'><circle cx="12" cy="12" r="9"/><path d="M9 12l2 2 4-4"/></svg>',
+  'filter':'<svg viewBox="0 0 24 24" '+SVGW+'><path d="M4 5h16l-6 7v6l-4 2v-8Z"/></svg>',
+  'rotate':'<svg viewBox="0 0 24 24" '+SVGW+'><path d="M20 11A8 8 0 0 0 6 6.3L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 14 4.7l2-1.7"/><path d="M20 20v-4h-4"/></svg>',
+  'search':'<svg viewBox="0 0 24 24" '+SVGW+'><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>',
+};
+function ic(name){ return '<i class="icn">'+(ICON_SVG[name]||'')+'</i>'; }
+document.querySelectorAll('[data-icon]').forEach(e=>{ e.innerHTML=ICON_SVG[e.dataset.icon]||''; });
+
+/* ============ COMMON ============ */
+const cNavy="#0F2A3D", cTeal="#0E8C7B", cOrange="#F0801E", cOrangeL="#F6A860", cBlueL="#4C8FD4",
+      cSlate="#8B95A5", cGreen="#1E9E57", cRed="#E24B4A", cAmber="#F0A020", cGrid="rgba(128,128,128,0.14)";
+const CUST_COLORS=["#0F2A3D","#F0801E","#0E8C7B","#4C8FD4","#C0392B"];
+const fmt=n=>new Intl.NumberFormat('vi-VN').format(Math.round(n*100)/100);
+const fmt0=n=>new Intl.NumberFormat('vi-VN').format(Math.round(n));
+const fmtD=iso=>{ const d=new Date(iso+'T00:00:00'); return d.toLocaleDateString('vi-VN'); };
+const el=id=>document.getElementById(id);
+Chart.defaults.font.family="Inter,-apple-system,sans-serif";
+Chart.defaults.font.size=11; Chart.defaults.color="rgba(90,102,120,0.9)";
+let charts={};
+function upsert(id,cfg){ if(charts[id])charts[id].destroy(); const e=el(id); if(e)charts[id]=new Chart(e,cfg); }
+const caret=()=>'<span class="caret">▸</span>';
+function delta(pct){ if(pct===null||pct===undefined) return ''; const u=pct>=0; return '<div class="chg '+(u?'u':'d')+'">'+(u?'↑':'↓')+' '+Math.abs(pct).toFixed(1)+'%</div>'; }
+function kpiCard(icon,ttl,big,unit,chg,sub){
+  return '<div class="kpi">'+(chg||'')+'<div class="ic">'+ic(icon)+'</div>'
+  +'<div class="ttl">'+ttl+'</div><div class="big">'+big+' <small>'+unit+'</small></div>'
+  +(sub?'<div class="subtxt">'+sub+'</div>':'')+'</div>';
+}
+const MONTHS=RAW.months;
+const cumu=a=>{let s=0;return a.map(v=>Math.round((s+=v)*100)/100);};
+const CUSTOMERS=RAW.customers;
+const CUST_BY_ID={}; CUSTOMERS.forEach((c,i)=>{c.color=CUST_COLORS[i%CUST_COLORS.length]; CUST_BY_ID[c.id]=c;});
+const POS_ALL=RAW.pos;
+const INV_ALL=RAW.inventory;
+const TODAY=new Date('2026-08-17T00:00:00');
+
+/* ============ FILTER STATE ============ */
+const FS={kh:'all', from:'2026-01-01', to:'2026-08-31'};
+
+/* ============ POPULATE FILTER DROPDOWN ============ */
+(function(){
+  const khSel=el('fKH');
+  CUSTOMERS.forEach(c=>{ const op=document.createElement('option'); op.value=c.id; op.textContent=c.name; khSel.appendChild(op); });
+})();
+
+/* ============ PO helpers ============ */
+function poStatus(po){
+  if(po.late) return 'late';
+  if(po.progress>=100) return 'ok';
+  return 'wait';
+}
+const PO_STATUS_LABEL={ok:'Đã giao đủ', wait:'Đang xử lý/SX', late:'Chậm tiến độ'};
+
+function posFiltered(){
+  return POS_ALL.filter(p=>
+    (FS.kh==='all'||p.khid===FS.kh) &&
+    p.date>=FS.from && p.date<=FS.to
+  );
+}
+
+let dhFilter='all', dhCum='month';
+
+function invFiltered(){
+  return INV_ALL.filter(r=> FS.kh==='all'||r.khid===FS.kh );
+}
+let khoFilter='all';
+
+/* ============ PAGE 1: KHÁCH HÀNG & PO ============ */
+function renderDH(){
+  const pos=posFiltered();
+  const totQty=pos.reduce((a,p)=>a+p.qty,0);
+  const totAmt=pos.reduce((a,p)=>a+p.amt,0);
+  const lateN=pos.filter(p=>poStatus(p)==='late').length;
+  const due7N=pos.filter(p=>{
+    if(p.progress>=100) return false;
+    const dv=new Date(p.deliv+'T00:00:00');
+    const diffDays=Math.round((dv-TODAY)/864e5);
+    return diffDays>=0 && diffDays<=7;
+  }).length;
+
+  // % change vs previous month (last 2 months present in filtered set)
+  const byMonth={};
+  pos.forEach(p=>{ byMonth[p.month]=byMonth[p.month]||{qty:0,amt:0}; byMonth[p.month].qty+=p.qty; byMonth[p.month].amt+=p.amt; });
+  const monthsPresent=Object.keys(byMonth).map(Number).sort((a,b)=>a-b);
+  let qtyChg=null, amtChg=null;
+  if(monthsPresent.length>=2){
+    const last=monthsPresent[monthsPresent.length-1], prev=monthsPresent[monthsPresent.length-2];
+    const lq=byMonth[last].qty, pq=byMonth[prev].qty, la=byMonth[last].amt, pa=byMonth[prev].amt;
+    if(pq>0) qtyChg=(lq-pq)/pq*100;
+    if(pa>0) amtChg=(la-pa)/pa*100;
+  }
+
+  el('dhKpi').innerHTML=
+    kpiCard('invoice','Tổng số PO',fmt0(pos.length),'PO',null,'Đang theo dõi')
+    +kpiCard('package','Tổng sản lượng',fmt0(totQty),'pcs',delta(qtyChg),'Theo PO')
+    +kpiCard('cash','Tổng doanh thu',fmt0(totAmt),'USD',delta(amtChg),'Giá trị PO')
+    +kpiCard('alert-triangle','Chậm tiến độ',fmt0(lateN),'PO',null,lateN?'Cần xử lý':'Không có')
+    +kpiCard('calendar-due','Đến hạn ≤ 7 ngày',fmt0(due7N),'PO',null,'Cần đẩy nhanh');
+
+  // Donuts theo khách hàng
+  const revByC=CUSTOMERS.map(c=>({name:c.short,c:c.color,v:pos.filter(p=>p.khid===c.id).reduce((a,p)=>a+p.amt,0)})).filter(d=>d.v>0);
+  el('dhRevTotal').textContent=fmt0(totAmt);
+  upsert('dhRevDonut',{type:'doughnut',data:{labels:revByC.map(d=>d.name),datasets:[{data:revByC.map(d=>d.v),backgroundColor:revByC.map(d=>d.c),borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.label+': '+fmt0(c.parsed)+' USD'}}}}});
+  el('dhRevLeg').innerHTML=revByC.map(d=>'<div class="li"><span class="dot" style="background:'+d.c+'"></span><span class="txt">'+d.name+'</span><span class="num">'+fmt0(d.v)+'</span></div>').join('');
+
+  const qtyByC=CUSTOMERS.map(c=>({name:c.short,c:c.color,v:pos.filter(p=>p.khid===c.id).reduce((a,p)=>a+p.qty,0)})).filter(d=>d.v>0);
+  el('dhQtyTotal').textContent=fmt0(totQty);
+  upsert('dhQtyDonut',{type:'doughnut',data:{labels:qtyByC.map(d=>d.name),datasets:[{data:qtyByC.map(d=>d.v),backgroundColor:qtyByC.map(d=>d.c),borderWidth:2,borderColor:'#fff'}]},
+    options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.label+': '+fmt0(c.parsed)+' pcs'}}}}});
+  el('dhQtyLeg').innerHTML=qtyByC.map(d=>'<div class="li"><span class="dot" style="background:'+d.c+'"></span><span class="txt">'+d.name+'</span><span class="num">'+fmt0(d.v)+'</span></div>').join('');
+
+  // Chart theo tháng
+  const qtyArr=MONTHS.map((m,i)=>byMonth[i+1]?byMonth[i+1].qty:0);
+  const amtArr=MONTHS.map((m,i)=>byMonth[i+1]?byMonth[i+1].amt:0);
+  const qtyD=dhCum==='cumu'?cumu(qtyArr):qtyArr;
+  const amtD=dhCum==='cumu'?cumu(amtArr):amtArr;
+  upsert('dhMonth',{data:{labels:MONTHS,datasets:[
+    {type:'bar',label:'Sản lượng (pcs)',data:qtyD,backgroundColor:cNavy,borderRadius:4,order:2,yAxisID:'y'},
+    {type:'line',label:'Doanh thu (USD)',data:amtD,borderColor:cOrange,backgroundColor:cOrange,borderWidth:2.5,tension:.3,pointRadius:2,order:1,yAxisID:'y1'}]},
+    options:{responsive:true,maintainAspectRatio:false,interaction:{mode:'index',intersect:false},
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.dataset.label+': '+fmt0(c.parsed.y)+(c.datasetIndex===0?' pcs':' USD')}}},
+    scales:{y:{grid:{color:cGrid},ticks:{callback:v=>fmt0(v)}},y1:{position:'right',grid:{display:false},ticks:{callback:v=>fmt0(v),color:cOrange}},x:{grid:{display:false}}}}});
+  document.querySelectorAll('.dh-cum').forEach(b=>b.classList.toggle('on',b.dataset.v===dhCum));
+
+  // Bảng PO
+  const posSorted=pos.slice().sort((a,b)=> b.date<a.date?-1: b.date>a.date?1:0);
+  const posShown=dhFilter==='all'?posSorted:posSorted.filter(p=>poStatus(p)===dhFilter);
+  el('dhPoBody').innerHTML=posShown.map((p,i)=>{
+    const key='po'+i;
+    const cust=CUST_BY_ID[p.khid];
+    const st=poStatus(p);
+    const pillTxt=PO_STATUS_LABEL[st];
+    // Sub-row columns mirror the parent header exactly (9 cols):
+    // [caret] [Số PO->mã hàng] [Khách hàng] [Ngày PO] [Số mặt hàng] [Sản lượng] [Giá trị] [Ngày giao] [Trạng thái]
+    const sub=p.items.map(it=>'<tr class="subrow" data-key="'+key+'" style="display:none"><td></td><td>'+it.code+' <span class="s2">'+it.desc+'</span></td>'
+      +'<td>'+cust.name+'</td><td>'+fmtD(p.date)+'</td><td>—</td>'
+      +'<td class="mono">'+fmt0(it.qty)+'</td><td class="mono">'+fmt(it.qty*it.price)+'</td>'
+      +'<td>'+fmtD(p.deliv)+'</td><td>—</td></tr>').join('');
+    return '<tr class="prow" data-key="'+key+'"><td>'+caret()+'</td><td><b>'+p.id+'</b></td><td>'+cust.name+'</td><td>'+fmtD(p.date)+'</td>'
+      +'<td class="mono">'+p.items.length+'</td><td class="mono">'+fmt0(p.qty)+'</td><td class="mono">'+fmt(p.amt)+'</td><td>'+fmtD(p.deliv)+'</td>'
+      +'<td><span class="pill '+st+'">'+pillTxt+'</span></td></tr>'+sub;
+  }).join('')
+  +'<tr class="tot"><td></td><td colspan="3">TỔNG ('+posShown.length+' PO)</td>'
+  +'<td class="mono">'+posShown.reduce((a,p)=>a+p.items.length,0)+'</td>'
+  +'<td class="mono">'+fmt0(posShown.reduce((a,p)=>a+p.qty,0))+'</td>'
+  +'<td class="mono">'+fmt(posShown.reduce((a,p)=>a+p.amt,0))+'</td><td></td><td></td></tr>';
+  drill('dhPoBody');
+  document.querySelectorAll('.dh-tab').forEach(b=>b.classList.toggle('on',b.dataset.k===dhFilter));
+}
+
+/* ============ PAGE 2: TỒN KHO & SẢN XUẤT ============ */
+// Gộp tồn kho theo MÃ HÀNG (toàn hệ thống) — không chia theo khách hàng,
+// vì "Cần cho PO xác nhận" là tổng nhu cầu từ TẤT CẢ PO (mọi khách hàng) đặt mã đó.
+function invGlobal(){
+  const map={};
+  invFiltered().forEach(r=>{
+    if(!map[r.code]) map[r.code]={code:r.code, desc:r.desc, stock:r.stock, need:0, khids:new Set()};
+    map[r.code].need+=r.need;
+    map[r.code].khids.add(r.khid);
+  });
+  return Object.values(map).map(r=>{
+    const shortage=Math.max(0, r.need-r.stock);
+    const to_produce=shortage>0?Math.round(shortage*1.05):0;
+    let status='ok';
+    if(shortage>0) status = (shortage/Math.max(1,r.need) < 0.30) ? 'watch' : 'urgent';
+    return {code:r.code, desc:r.desc, stock:r.stock, need:r.need, shortage, to_produce, status};
+  });
+}
+let khoSearch='';
+
+// ===== Bảng chi tiết PO & sản phẩm thiếu hàng (đặt trước bảng tồn kho) =====
+let khopoFilter='all';
+function renderKhoPo(invMap){
+  const pos=posFiltered().filter(p=>p.progress<100); // PO chưa hoàn tất giao hàng
+  let lines=[];
+  pos.forEach(p=>{
+    const cust=CUST_BY_ID[p.khid];
+    p.items.forEach(it=>{
+      const invRow=invMap[it.code];
+      let short=0;
+      if(invRow && invRow.shortage>0 && invRow.need>0){
+        short=Math.round(invRow.shortage * it.qty / invRow.need);
+        short=Math.min(short, it.qty);
+      }
+      lines.push({po:p, cust, it, short});
+    });
+  });
+  lines.sort((a,b)=> a.po.deliv<b.po.deliv?-1: a.po.deliv>b.po.deliv?1: b.short-a.short);
+  const shown=khopoFilter==='all'?lines:lines.filter(l=>khopoFilter==='short'?l.short>0:l.short===0);
+  el('khoPoBody').innerHTML = shown.length ? shown.map(l=>{
+    const st=l.short>0?'urgent':'ok';
+    const stTxt=l.short>0?'Thiếu hàng':'Đủ hàng';
+    return '<tr><td><b>'+l.po.id+'</b></td><td>'+l.cust.name+'</td>'
+      +'<td>'+l.it.code+'<div class="s2">'+l.it.desc+'</div></td>'
+      +'<td>'+fmtD(l.po.date)+'</td><td>'+fmtD(l.po.deliv)+'</td>'
+      +'<td class="mono">'+fmt0(l.it.qty)+'</td>'
+      +'<td class="mono'+(l.short>0?' dn':'')+'">'+fmt0(l.short)+'</td>'
+      +'<td><span class="pill '+st+'">'+stTxt+'</span></td></tr>';
+  }).join('')
+  : '<tr><td colspan="8" style="text-align:center;color:var(--tx-tertiary);padding:20px 0">Không có PO nào phù hợp.</td></tr>';
+  document.querySelectorAll('.khopo-tab').forEach(b=>b.classList.toggle('on',b.dataset.k===khopoFilter));
+}
+
+function renderKho(){
+  const inv=invGlobal();
+  const invMap={}; inv.forEach(r=>invMap[r.code]=r);
+  renderKhoPo(invMap);
+  const totSku=inv.length;
+  const shortSku=inv.filter(r=>r.shortage>0).length;
+  const totShort=inv.reduce((a,r)=>a+r.shortage,0);
+  const urgentSku=inv.filter(r=>r.status==='urgent').length;
+
+  el('khoKpi').innerHTML=
+    kpiCard('list','Tổng SKU theo dõi',fmt0(totSku),'SKU',null,'Đang theo dõi')
+    +kpiCard('package-off','SKU thiếu hàng',fmt0(shortSku),'SKU',null,shortSku?'So với nhu cầu PO':'Không có')
+    +kpiCard('stack-2','Tổng số lượng thiếu',fmt0(totShort),'pcs',null,'Cộng dồn')
+    +kpiCard('flame','SKU cần SX gấp',fmt0(urgentSku),'SKU',null,urgentSku?'Thiếu ≥ 30% nhu cầu':'Không có');
+
+  // Top 10 chart
+  const top10=inv.slice().sort((a,b)=>b.shortage-a.shortage).filter(r=>r.shortage>0).slice(0,10);
+  upsert('khoTop10',{type:'bar',data:{labels:top10.map(r=>r.code),datasets:[{label:'Thiếu (pcs)',data:top10.map(r=>r.shortage),backgroundColor:top10.map((r,i)=>i<3?cRed:cAmber),borderRadius:4}]},
+    options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>{const r=top10[c.dataIndex]; return ['Thiếu: '+fmt0(r.shortage)+' pcs','Cần: '+fmt0(r.need)+' · Tồn: '+fmt0(r.stock)];}}}},
+    scales:{x:{grid:{color:cGrid},ticks:{callback:v=>fmt0(v)}},y:{grid:{display:false},ticks:{font:{size:10.5}}}}}});
+
+  // Bảng chi tiết
+  const STATUS_LABEL={ok:'Đủ hàng',watch:'Cần theo dõi',urgent:'Thiếu gấp'};
+  let invSorted=inv.slice().sort((a,b)=>b.shortage-a.shortage);
+  if(khoSearch.trim()){
+    const q=khoSearch.trim().toLowerCase();
+    invSorted=invSorted.filter(r=>r.code.toLowerCase().includes(q)||r.desc.toLowerCase().includes(q));
+  }
+  const invShown=khoFilter==='all'?invSorted:invSorted.filter(r=>r.status===khoFilter);
+  el('khoBody').innerHTML=invShown.map(r=>{
+    return '<tr><td><b>'+r.code+'</b><div class="s2">'+r.desc+'</div></td>'
+      +'<td class="mono">'+fmt0(r.stock)+'</td><td class="mono">'+fmt0(r.need)+'</td>'
+      +'<td class="mono'+(r.shortage>0?' dn':'')+'">'+fmt0(r.shortage)+'</td>'
+      +'<td class="mono">'+fmt0(r.to_produce)+'</td>'
+      +'<td><span class="pill '+r.status+'">'+STATUS_LABEL[r.status]+'</span></td></tr>';
+  }).join('')
+  +(invShown.length?'<tr class="tot"><td>TỔNG ('+invShown.length+' SKU)</td>'
+  +'<td class="mono">'+fmt0(invShown.reduce((a,r)=>a+r.stock,0))+'</td>'
+  +'<td class="mono">'+fmt0(invShown.reduce((a,r)=>a+r.need,0))+'</td>'
+  +'<td class="mono">'+fmt0(invShown.reduce((a,r)=>a+r.shortage,0))+'</td>'
+  +'<td class="mono">'+fmt0(invShown.reduce((a,r)=>a+r.to_produce,0))+'</td><td></td></tr>'
+  :'<tr><td colspan="6" style="text-align:center;color:var(--tx-tertiary);padding:20px 0">Không tìm thấy mã hàng phù hợp.</td></tr>');
+  document.querySelectorAll('.kho-tab').forEach(b=>b.classList.toggle('on',b.dataset.k===khoFilter));
+}
+
+/* ============ DRILL-DOWN ============ */
+function drill(tbodyId){
+  el(tbodyId).querySelectorAll('.prow').forEach(row=>{
+    row.addEventListener('click',()=>{
+      const key=row.dataset.key;
+      const open=!row.classList.contains('open');
+      row.closest('tbody').querySelectorAll('.prow.open').forEach(r=>{
+        if(r!==row){r.classList.remove('open');
+          r.closest('tbody').querySelectorAll('.subrow[data-key="'+r.dataset.key+'"]').forEach(s=>s.style.display='none');}
+      });
+      row.classList.toggle('open',open);
+      row.closest('tbody').querySelectorAll('.subrow[data-key="'+key+'"]').forEach(s=>s.style.display=open?'':'none');
+    });
+  });
+}
+
+/* ============ NAV ============ */
+let currentPage='dh';
+function showPage(id){
+  currentPage=id;
+  document.querySelectorAll('.page').forEach(p=>p.style.display='none');
+  el('page-'+id).style.display='block';
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.dataset.page===id));
+  if(id==='dh')renderDH();
+  if(id==='kho')renderKho();
+}
+document.querySelectorAll('#nav button').forEach(b=>b.addEventListener('click',()=>showPage(b.dataset.page)));
+
+/* ============ FILTER WIRING ============ */
+function reRender(){ if(currentPage==='dh')renderDH(); if(currentPage==='kho')renderKho(); }
+el('fKH').addEventListener('change',e=>{FS.kh=e.target.value;reRender();});
+el('fFrom').addEventListener('change',e=>{FS.from=e.target.value;reRender();});
+el('fTo').addEventListener('change',e=>{FS.to=e.target.value;reRender();});
+el('fReset').addEventListener('click',()=>{
+  FS.kh='all';FS.from='2026-01-01';FS.to='2026-08-31';
+  el('fKH').value='all';el('fFrom').value='2026-01-01';el('fTo').value='2026-08-31';
+  reRender();
+});
+document.querySelectorAll('.dh-tab').forEach(b=>b.addEventListener('click',()=>{dhFilter=b.dataset.k;renderDH();}));
+document.querySelectorAll('.dh-cum').forEach(b=>b.addEventListener('click',()=>{dhCum=b.dataset.v;renderDH();}));
+document.querySelectorAll('.kho-tab').forEach(b=>b.addEventListener('click',()=>{khoFilter=b.dataset.k;renderKho();}));
+document.querySelectorAll('.khopo-tab').forEach(b=>b.addEventListener('click',()=>{khopoFilter=b.dataset.k;renderKho();}));
+el('khoSearch').addEventListener('input',e=>{khoSearch=e.target.value;renderKho();});
+
+showPage('dh');
+</script>
+</body>
+</html>
