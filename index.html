@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xốp Thiên Quang — Sơ đồ giải pháp dữ liệu</title>
+<link href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+--bg:#F4F7FC; --ink:#12263F; --ink-2:#5A7194; --ink-3:#75879F; --gold:#C98A08;
+--stagebg:#FAFCFF;
+--sc:#FFFFFF; --sc2:#F3F7FF; --sframe:#9DBBE4; --sl:#C8D8EE;
+--st0:#FFFFFF; --st1:#12263F; --st2:#5A7194; --st3:#75879F;
+--sHeader:#0F2C5C; --sOnHeader:#FFFFFF; --sOnHeader2:#FFD782; --sonAcc:#04173A;
+--ssoft:rgba(15,44,92,.045); --ssoft2:rgba(15,44,92,.025);
+--k-gold:#C98A08; --k-cyan:#1786C4; --k-purple:#7A4FD1; --k-green:#12965E;
+--k-red:#D9483A; --k-orange:#D97218; --k-pink:#C93E76; --k-teal:#0E9488;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;overflow-x:clip}
+body{background:var(--bg);color:var(--ink);font-family:'Be Vietnam Pro',system-ui,sans-serif;
+font-size:13px;line-height:1.45;-webkit-font-smoothing:antialiased;padding:20px 20px 26px}
+.wrap{width:100%;max-width:1760px;margin:0 auto}
+.head{display:flex;align-items:center;justify-content:center;gap:16px;margin-bottom:14px;flex-wrap:wrap}
+.logo{height:52px;width:auto;flex:0 0 auto}
+.headmid{text-align:left;min-width:0}
+.headmid h1{margin:0;font-size:clamp(18px,2.1vw,27px);font-weight:800;letter-spacing:-.02em;line-height:1.15}
+.headmid h1 em{font-style:normal;color:var(--gold)}
+.headmid .sub{margin-top:4px;font-size:12.5px;color:var(--ink-2)}
+.nav{display:flex;justify-content:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.nav button{background:#fff;border:1px solid var(--sl);color:var(--ink-2);border-radius:999px;
+padding:9px 18px;font-family:inherit;font-size:12.5px;font-weight:700;cursor:pointer;transition:.15s}
+.nav button:hover{border-color:var(--gold);color:var(--gold)}
+.nav button.on{background:var(--sHeader);border-color:var(--sHeader);color:#fff}
+.subnav{display:flex;justify-content:center;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.subnav.hidden{display:none}
+.subnav button{background:var(--sc2);border:1px solid var(--sl);color:var(--ink-2);border-radius:999px;
+padding:6px 15px;font-family:inherit;font-size:11.5px;font-weight:600;cursor:pointer;transition:.15s}
+.subnav button:hover{border-color:var(--gold);color:var(--gold)}
+.subnav button.on{background:#fff;border-color:var(--gold);color:var(--gold);font-weight:800}
+.stage{position:relative;border-radius:16px;overflow:hidden;background:var(--stagebg);
+border:1px solid #E2E8F2}
+svg#stage{display:block;width:100%;height:auto}
+.pagegrp.hidden{display:none}
+.cap{margin-top:13px;background:var(--sc);border:1px solid var(--sl);border-left:4px solid var(--gold);
+border-radius:12px;padding:13px 18px;display:flex;align-items:center;gap:16px;min-height:58px}
+.cap .k{font-size:23px;font-weight:800;color:var(--gold);line-height:1;min-width:112px;text-align:center}
+.cap .k small{display:block;font-size:10px;font-weight:600;color:var(--ink-3);margin-top:5px}
+.cap .t{font-size:13.5px;line-height:1.55;color:var(--ink-2)}
+.cap .t b{color:var(--ink);font-weight:700}
+.cap .t i{font-style:normal;color:var(--k-cyan);font-weight:700}
+.foot{margin-top:9px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.note{font-size:11px;color:var(--ink-3)}
+.rp{background:none;border:1px solid var(--sl);color:var(--ink-2);border-radius:8px;padding:6px 14px;
+font-family:inherit;font-size:11.5px;cursor:pointer}
+.rp:hover{border-color:var(--gold);color:var(--gold)}
+.reportPanel{border-radius:16px;background:var(--stagebg);border:1px solid #E2E8F2;
+min-height:420px;display:flex;align-items:center;justify-content:center;padding:40px 20px}
+.reportPanel.hidden{display:none}
+.reportCard{max-width:460px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:6px}
+.reportIcon{width:64px;height:64px;margin-bottom:8px}
+.reportCard h2{margin:0;font-size:22px;font-weight:800;color:var(--ink)}
+.reportCard p{margin:4px 0 14px;font-size:13px;color:var(--ink-2);line-height:1.55}
+.reportBtn{background:var(--sHeader);color:#fff;border-radius:999px;padding:12px 28px;
+font-weight:700;font-size:14px;text-decoration:none;transition:.15s;display:inline-block}
+.reportBtn:hover{background:var(--gold)}
+.reportHint{margin-top:12px;font-size:10.5px;color:var(--ink-3)}
+.reportHint code{background:var(--ssoft);padding:2px 6px;border-radius:5px;color:var(--ink-2)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<div class="head">
+<img class="logo" src="data:image/png;base64,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" alt="Xốp Thiên Quang">
+<div class="headmid">
+<h1>Xốp Thiên Quang — <em>Sơ đồ giải pháp dữ liệu</em></h1>
+<div class="sub">Tích hợp &amp; tự động hoá vận hành · Kiến trúc dữ liệu &amp; báo cáo quản trị</div>
+</div>
+</div>
+
+<div class="nav" id="nav">
+<button class="on" data-page="p1">① Tích hợp &amp; Tự động hoá vận hành</button>
+<button data-page="p2">② Kiến trúc dữ liệu hiện tại</button>
+<button data-page="p3">③ Báo cáo quản trị ↗</button>
+</div>
+
+<div class="subnav" id="subnav1">
+<button class="on" data-sub="a">Luồng 1 · Đồng bộ tồn kho</button>
+<button data-sub="b">Luồng 2 · Kế hoạch sản xuất</button>
+<button data-sub="c">Luồng 3 · Đơn hàng thay đổi</button>
+</div>
+
+<div class="stage" id="stageWrap">
+<svg id="stage" viewBox="0 0 1800 800" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<filter id="glow" x="-60%" y="-60%" width="220%" height="220%">
+<feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge>
+</filter>
+<g id="defsPaths"></g>
+<linearGradient id="gOr" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#FF9A3D"/><stop offset="1" stop-color="#E8730E"/></linearGradient>
+<linearGradient id="gPu" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#A78BFA"/><stop offset="1" stop-color="#6D28D9"/></linearGradient>
+<linearGradient id="gBl" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#60A5FA"/><stop offset="1" stop-color="#1D4ED8"/></linearGradient>
+</defs>
+<g id="lyLines1a" class="pagegrp"></g><g id="ly1a" class="pagegrp"></g>
+<g id="lyLines1b" class="pagegrp hidden"></g><g id="ly1b" class="pagegrp hidden"></g>
+<g id="lyLines1c" class="pagegrp hidden"></g><g id="ly1c" class="pagegrp hidden"></g>
+<g id="lyLines2" class="pagegrp hidden"></g><g id="ly2" class="pagegrp hidden"></g>
+<g id="fx"></g>
+</svg>
+</div>
+
+<div class="reportPanel hidden" id="reportPanel">
+<div class="reportCard">
+<svg class="reportIcon" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+<rect x="4" y="4" width="40" height="40" rx="10" fill="var(--sHeader)"/>
+<path d="M14 30 L14 20 M22 30 L22 14 M30 30 L30 24" stroke="var(--sOnHeader2)" stroke-width="3.4" stroke-linecap="round"/>
+</svg>
+<h2>Báo cáo quản trị</h2>
+<p>Khách hàng &amp; PO · Sản xuất · Tồn kho — báo cáo demo dựng từ dữ liệu thật của Xốp Thiên Quang.</p>
+<a class="reportBtn" href="report.html" target="_blank" rel="noopener">Mở báo cáo ↗</a>
+<div class="reportHint">Mở trong tab mới · file <code>report.html</code> nằm cùng thư mục với sơ đồ này</div>
+</div>
+</div>
+
+<div class="cap" id="capWrap"><div class="k" id="capK">–<small>&nbsp;</small></div><div class="t" id="capT">&nbsp;</div></div>
+<div class="foot" id="footWrap">
+<div class="note" id="pageNote">Sơ đồ minh hoạ luồng vận hành &amp; tích hợp — dùng để trao đổi với khách hàng, không phải tài liệu kỹ thuật chi tiết.</div>
+<button class="rp" id="replay">↻ Chạy lại</button>
+</div>
+</div>
+
+<script>
+(function(){
+'use strict';
+const NS='http://www.w3.org/2000/svg', $=id=>document.getElementById(id);
+const el=(n,a)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);return e;};
+const T=(x,y,t,f,s,w,an)=>{const e=el('text',{x,y,fill:f,'font-size':s,'font-weight':w||600,'text-anchor':an||'start'});e.textContent=t;return e;};
+
+/* ================= ICON ================= */
+function ic(kind,x,y,c,sc){
+const g=el('g',{transform:`translate(${x},${y}) scale(${sc||1})`,fill:'none',stroke:c,
+'stroke-width':1.9,'stroke-linecap':'round','stroke-linejoin':'round'});
+const P=d=>g.appendChild(el('path',{d})), C=(cx,cy,r,f)=>g.appendChild(el('circle',{cx,cy,r,fill:f||'none'}));
+switch(kind){
+case 'grid': g.appendChild(el('rect',{x:-9,y:-9,width:18,height:18,rx:2.4})); P('M-9,-3 h18 M-9,3 h18 M-3,-9 v18 M3,-9 v18'); break;
+case 'sheet': g.appendChild(el('rect',{x:-8,y:-9,width:16,height:18,rx:2.4})); P('M-8,-3 h16 M-8,3 h16 M-1.5,-9 v18'); break;
+case 'gear': C(0,0,3.4); P('M0,-9.5 v3.2 M0,9.5 v-3.2 M-9.5,0 h3.2 M9.5,0 h-3.2 M-6.7,-6.7 l2.3,2.3 M6.7,6.7 l-2.3,-2.3 M6.7,-6.7 l-2.3,2.3 M-6.7,6.7 l2.3,-2.3'); break;
+case 'wh': P('M-10,-1 L0,-9 L10,-1 v10 h-20 Z'); P('M-5,9 v-6 h10 v6'); break;
+case 'cart': P('M-8,-6 h2.5 l2,10 h9 l2,-7.5 h-11.5'); C(-2,6.5,1.5,c); C(5,6.5,1.5,c); break;
+case 'user': C(0,-4,3.6); P('M-8,8 c0,-4.4 3.6,-7 8,-7 s8,2.6 8,7'); break;
+case 'doc': P('M-7,-10 h10 l4,4 v16 h-14 Z M3,-10 v4 h4 M-4,-2 h8 M-4,3 h8'); break;
+case 'chart': P('M-9,8 h18 M-6,8 v-7 M0,8 v-12 M6,8 v-5'); break;
+case 'plug': P('M-4,-9 v5 M4,-9 v5 M-8,-4 h16 v4 a8,8 0 0 1 -16,0 Z M0,4 v6'); break;
+case 'db': g.appendChild(el('ellipse',{cx:0,cy:-6,rx:9,ry:3.4,fill:'none'}));
+P('M-9,-6 v12 c0,1.9 4,3.4 9,3.4 s9,-1.5 9,-3.4 v-12 M-9,0 c0,1.9 4,3.4 9,3.4 s9,-1.5 9,-3.4'); break;
+case 'shield': P('M0,-10 L9,-6 v6 C9,5 4.5,9 0,10.5 C-4.5,9 -9,5 -9,0 v-6 Z'); break;
+case 'users': C(-3.5,-4,3.2); C(5,-3,2.6); P('M-10,7 c0,-4 3,-6 6.5,-6 s6.5,2 6.5,6 M4,1.4 c3.2,0 6,1.8 6,5.6'); break;
+case 'lock': g.appendChild(el('rect',{x:-6.5,y:-1.5,width:13,height:10.5,rx:2.2})); P('M-3.8,-1.5 v-3.7 a3.8,3.8 0 0 1 7.6,0 v3.7'); break;
+case 'eye': P('M-10,0 C-6,-5.5 6,-5.5 10,0 C6,5.5 -6,5.5 -10,0 Z'); C(0,0,2.8); break;
+case 'check': P('M-8,0 l5.5,5.5 l11,-12'); break;
+case 'cloud': P('M-6,5 a5,5 0 0 1 0.6,-9.9 A6.5,6.5 0 0 1 7,-2.5 a4,4 0 0 1 0,7.5 Z'); break;
+}
+return g;
+}
+
+/* ================= HẠ TẦNG VẼ (dùng chung 2 trang) ================= */
+const PATHS={}, defs=$('defsPaths');
+function wire(id,lines,d,opt){
+opt=opt||{};
+const p=el('path',{id,d,fill:'none'}); defs.appendChild(p);
+PATHS[id]={node:p,len:p.getTotalLength()};
+const v=el('path',{d,fill:'none',stroke:opt.stroke||'var(--sl)','stroke-width':opt.w||1.6,
+'stroke-dasharray':opt.dash||'4 6',opacity:opt.o||.55});
+lines.appendChild(v);
+if(opt.arrow){
+  const pt=p.getPointAtLength(p.getTotalLength());
+  const pt2=p.getPointAtLength(Math.max(0,p.getTotalLength()-9));
+  const ang=Math.atan2(pt.y-pt2.y,pt.x-pt2.x);
+  const s=6.2;
+  const ax1=pt.x-s*Math.cos(ang-.5), ay1=pt.y-s*Math.sin(ang-.5);
+  const ax2=pt.x-s*Math.cos(ang+.5), ay2=pt.y-s*Math.sin(ang+.5);
+  lines.appendChild(el('path',{d:`M${pt.x},${pt.y} L${ax1},${ay1} M${pt.x},${pt.y} L${ax2},${ay2}`,
+    stroke:opt.stroke||'var(--sl)','stroke-width':opt.w||1.6,opacity:opt.o||.55}));
+}
+}
+function at(id,t){const p=PATHS[id];if(!p)return{x:0,y:0};return p.node.getPointAtLength(Math.max(0,Math.min(1,t))*p.len);}
+let parts=[];
+function dot(id,color,speed,onEnd,r){
+if(!PATHS[id]){ if(onEnd)onEnd(); return; }
+const n=el('circle',{r:r||3.8,fill:color,filter:'url(#glow)'});
+$('fx').appendChild(n); parts.push({node:n,id,t:0,speed,onEnd});
+}
+function clearFx(){parts.forEach(p=>p.node.remove());parts=[];}
+function card(g,x,y,w,h,c,opt){
+opt=opt||{};
+const box=el('rect',{x,y,width:w,height:h,rx:opt.rx||12,fill:opt.fill||'var(--sc)',stroke:c,'stroke-width':opt.sw||1.4});
+g.appendChild(box);
+if(opt.bar!==false) g.appendChild(el('rect',{x,y,width:5,height:h,rx:2.5,fill:c}));
+return box;
+}
+/* mini-bảng dữ liệu (mô phỏng màn hình Base.vn) */
+function miniTable(g,x,y,w,headers,rows,colWFrac,highlightCols){
+  highlightCols=highlightCols||[];
+  const headerH=25, rowH=25;
+  const colW=colWFrac.map(f=>f*w);
+  g.appendChild(el('rect',{x,y,width:w,height:headerH,fill:'var(--sHeader)'}));
+  let cx=x;
+  headers.forEach((h,i)=>{
+    g.appendChild(T(cx+colW[i]/2,y+16.5,h,'var(--sOnHeader)',8.4,800,'middle'));
+    cx+=colW[i];
+  });
+  rows.forEach((row,ri)=>{
+    const ry=y+headerH+ri*rowH;
+    if(ri%2===1) g.appendChild(el('rect',{x,y:ry,width:w,height:rowH,fill:'var(--ssoft)'}));
+    let cx2=x;
+    row.forEach((val,ci)=>{
+      const hi=highlightCols.includes(ci);
+      if(hi) g.appendChild(el('rect',{x:cx2+2,y:ry+2,width:colW[ci]-4,height:rowH-4,rx:4,
+        fill:'rgba(201,138,8,.14)',stroke:'var(--k-gold)','stroke-width':1}));
+      const anchor=ci===0?'start':'end';
+      const tx=ci===0?cx2+7:cx2+colW[ci]-7;
+      g.appendChild(T(tx,ry+16.5,val,hi?'var(--k-gold)':'var(--st2)',8.8,hi?800:600,anchor));
+      cx2+=colW[ci];
+    });
+  });
+  const totalH=headerH+rows.length*rowH;
+  g.appendChild(el('rect',{x,y,width:w,height:totalH,fill:'none',stroke:'var(--sl)','stroke-width':1}));
+  let vx=x;
+  colWFrac.forEach((f,i)=>{ if(i>0) g.appendChild(el('line',{x1:vx,y1:y,x2:vx,y2:y+totalH,stroke:'var(--sl)','stroke-width':1})); vx+=f*w; });
+  return {bottom:y+totalH,height:totalH};
+}
+
+/* ============================================================
+   TRANG 1 — TÍCH HỢP & TỰ ĐỘNG HOÁ VẬN HÀNH (3 map riêng theo 3 luồng)
+   ============================================================ */
+function n8nBadge(g,x,y,color){
+  const w=126,h=50;
+  card(g,x-w/2,y-h/2,w,h,color,{fill:'var(--sc)',rx:25,sw:1.8,bar:false});
+  g.appendChild(ic('plug',x-34,y,color,1.05));
+  g.appendChild(T(x-10,y+5,'n8n','var(--st1)',15,800));
+}
+/* panel đơn (Base Table / Google Sheet): khung + header đậm + mini-bảng */
+function panelWithTable(g,x,y,w,icon,color,title,sub,tableCaption,tbl){
+  const headerH=68;
+  const tableH = tbl ? 25+tbl.rows.length*25 : 0;
+  const h = headerH + (tbl? 30+18+tableH+18 : 20);
+  g.appendChild(el('rect',{x,y,width:w,height:h,rx:16,fill:'var(--sc)',
+    stroke:'var(--sframe)','stroke-width':1.4}));
+  g.appendChild(el('rect',{x,y,width:w,height:headerH,rx:16,fill:'var(--sHeader)'}));
+  g.appendChild(el('rect',{x,y:y+headerH-16,width:w,height:16,fill:'var(--sHeader)'}));
+  g.appendChild(el('rect',{x:x+16,y:y+14,width:40,height:40,rx:11,fill:'rgba(255,255,255,.14)'}));
+  g.appendChild(ic(icon,x+36,y+34,'var(--sOnHeader)',1.3));
+  g.appendChild(T(x+68,y+32,title,'var(--sOnHeader)',15.5,800));
+  g.appendChild(T(x+68,y+52,sub,'var(--sOnHeader2)',10.2,600));
+  let tblBottom=y+headerH;
+  if(tbl){
+    g.appendChild(T(x+18,y+headerH+22,tableCaption,'var(--st3)',9.6,700));
+    const r=miniTable(g,x+18,y+headerH+30,w-36,tbl.headers,tbl.rows,tbl.colW,tbl.hi);
+    tblBottom=r.bottom;
+  }
+  return {x,y,w,h,leftX:x,rightX:x+w,headerMidY:y+headerH/2,tableMidY:(y+headerH+tblBottom)/2,tblBottom};
+}
+/* chip quy trình con trong Base Service: header nhỏ + mini-bảng */
+function chipWithTable(g,x,y,w,icon,color,label,sub,tableCaption,tbl){
+  const headerH=58;
+  const tableH = tbl ? 25+tbl.rows.length*25 : 0;
+  const h = headerH + (tbl? 22+16+tableH+14 : 10);
+  card(g,x,y,w,h,color,{fill:'var(--sc2)'});
+  g.appendChild(el('rect',{x:x+16,y:y+14,width:34,height:34,rx:9,fill:color,opacity:.16}));
+  g.appendChild(ic(icon,x+33,y+31,color,1.05));
+  g.appendChild(T(x+62,y+28,label,'var(--st1)',12.8,800));
+  g.appendChild(T(x+62,y+47,sub,'var(--st3)',9.8,500));
+  let tblBottom=y+headerH;
+  if(tbl){
+    g.appendChild(T(x+18,y+headerH+16,tableCaption,'var(--st3)',9,700));
+    const r=miniTable(g,x+18,y+headerH+22,w-36,tbl.headers,tbl.rows,tbl.colW,tbl.hi);
+    tblBottom=r.bottom;
+  }
+  return {x,y,w,h,leftX:x,rightX:x+w,headerMidY:y+headerH/2,tableMidY:(y+headerH+tblBottom)/2};
+}
+function serviceFrame(g,x,y,w,h,title,sub){
+  g.appendChild(el('rect',{x,y,width:w,height:h,rx:16,fill:'none',
+    stroke:'var(--sframe)','stroke-width':1.4,'stroke-dasharray':'7 6'}));
+  g.appendChild(el('rect',{x:x+16,y:y+14,width:w-32,height:52,rx:11,fill:'var(--sHeader)'}));
+  g.appendChild(T(x+w/2,y+36,title,'var(--sOnHeader)',13.5,800,'middle'));
+  g.appendChild(T(x+w/2,y+55,sub,'var(--sOnHeader2)',9.8,600,'middle'));
+}
+function twoWireWithLabel(idPrefix,g,lines,badgeColor,topColor,bottomColor,topLabel,bottomLabel,
+  bx,by,x1,y1,x2,y2,x3,y3,x4,y4){
+  n8nBadge(g,bx,by,badgeColor);
+  function sCurve(a,b,c,d){const mx=(a+c)/2;return `M${a},${b} C${mx},${b} ${mx},${d} ${c},${d}`;}
+  wire(idPrefix+'_top',lines,sCurve(x1,y1,x2,y2),{stroke:topColor,o:.7,w:2.2,arrow:true});
+  wire(idPrefix+'_bot',lines,sCurve(x3,y3,x4,y4),{stroke:bottomColor,o:.7,w:2.2,arrow:true});
+  g.appendChild(T(bx,by-92,topLabel,topColor,10.2,700,'middle'));
+  g.appendChild(T(bx,by+98,bottomLabel,bottomColor,10.2,700,'middle'));
+}
+
+/* ---- MAP A · Luồng 1: đồng bộ tồn kho — Base Table ⇄ n8n ⇄ 2 quy trình trong Base Service ---- */
+const g1la=$('lyLines1a'), g1a=$('ly1a');
+(function buildFlowA(){
+const g=g1a;
+const tb = panelWithTable(g,100,310,460,'grid','var(--k-cyan)','BASE TABLE','Lưu trữ tồn kho theo mã hàng',
+  'BẢNG TỒN KHO (trích)',
+  {headers:['MÃ HÀNG','TỒN KHO'],colW:[0.55,0.45],
+   rows:[['FXP-EP101','1.900'],['FXP-EP108','1.600'],['FXP-EP111','600']]});
+
+const svX=1160,svY=60,svW=540,svH=700;
+serviceFrame(g,svX,svY,svW,svH,'BASE SERVICE','Nơi xác nhận, xuất & nhập kho theo đơn hàng');
+const chipX=svX+30, chipW=svW-60;
+const chip1=chipWithTable(g,chipX,svY+72,chipW,'doc','var(--k-gold)','① QUY TRÌNH LÊN PO','Cần tồn kho để xác nhận đơn hàng',
+  'Bảng kiểm tra KHSX — n8n điền cột TỒN KHO',
+  {headers:['MÃ HÀNG','SL TỔNG','TỒN KHO','THIẾU'],colW:[0.3,0.24,0.24,0.22],
+   rows:[['FXP-EP101','1.850','1.900','-50'],['FXP-EP108','1.623','1.600','23']],hi:[2]});
+const chip2Y=chip1.y+chip1.h+18;
+const chip2=chipWithTable(g,chipX,chip2Y,chipW,'wh','var(--k-orange)','② QUY TRÌNH XUẤT KHO','Xuất kho theo phiếu, làm thay đổi số tồn',
+  'Bảng mã hàng cần giao — nguồn trừ tồn kho',
+  {headers:['MÃ HÀNG','SL CẦN GIAO'],colW:[0.6,0.4],
+   rows:[['FXP-EP101','1.850'],['FXP-EP108','1.623']]});
+const chip3Y=chip2.y+chip2.h+18;
+const chip3=chipWithTable(g,chipX,chip3Y,chipW,'wh','var(--k-teal)','③ QUY TRÌNH SẢN XUẤT','Sản xuất xong → nhập kho, cộng vào tồn',
+  'Sản lượng hoàn thành — n8n cộng vào tồn kho',
+  {headers:['MÃ HÀNG','SL SẢN XUẤT','NHẬP KHO'],colW:[0.38,0.3,0.32],
+   rows:[['FXP-EP105','330','+330'],['FXP-EP106','500','+500']],hi:[2]});
+
+const bx=(tb.rightX+chip1.leftX)/2, by=chip2.tableMidY;
+n8nBadge(g,bx,by,'var(--k-purple)');
+function sCurve(a,b,c,d){const mx=(a+c)/2;return `M${a},${b} C${mx},${b} ${mx},${d} ${c},${d}`;}
+wire('p1a_top',g1la,sCurve(tb.rightX,tb.headerMidY,chip1.leftX,chip1.tableMidY),{stroke:'var(--k-cyan)',o:.7,w:2.2,arrow:true});
+wire('p1a_bot',g1la,sCurve(chip2.leftX,chip2.tableMidY,tb.rightX,tb.tableMidY),{stroke:'var(--k-green)',o:.7,w:2.2,arrow:true});
+wire('p1a_bot2',g1la,sCurve(chip3.leftX,chip3.tableMidY,tb.rightX,tb.tblBottom-15),{stroke:'var(--k-teal)',o:.7,w:2.2,arrow:true});
+g.appendChild(T(bx,by-150,'n8n · điền tồn kho vào bảng KHSX','var(--k-cyan)',10.2,700,'middle'));
+g.appendChild(T(bx,by+150,'n8n · xuất kho & nhập kho tự động','var(--k-green)',10.2,700,'middle'));
+g.appendChild(T(bx,by+166,'cập nhật lại tồn kho','var(--k-green)',10.2,700,'middle'));
+})();
+const FLOW1A=[['p1a_top','var(--k-cyan)',.8],['p1a_bot','var(--k-green)',.8],['p1a_bot2','var(--k-teal)',.8]];
+const CAPS1A=[
+  ['Luồng 1a','<b>Base Table → n8n → Quy trình lên PO</b>: n8n điền số <i>tồn kho</i> vào bảng KHSX để tính được số thiếu, phục vụ xác nhận đơn.'],
+  ['Luồng 1b','<b>Quy trình xuất kho → n8n → Base Table</b>: sau khi lập phiếu <i>xuất kho</i>, n8n trừ ngược số lượng đã giao vào tồn kho.'],
+  ['Luồng 1c','<b>Quy trình sản xuất → n8n → Base Table</b>: sau khi sản xuất xong và <i>nhập kho</i>, n8n cộng số lượng nhập vào tồn kho.'],
+];
+
+/* ---- MAP B · Luồng 2: kế hoạch sản xuất — 2 quy trình trong Base Service ⇄ n8n ⇄ Google Sheet ---- */
+const g1lb=$('lyLines1b'), g1b=$('ly1b');
+(function buildFlowB(){
+const g=g1b;
+const svX=100,svY=110,svW=540,svH=500;
+serviceFrame(g,svX,svY,svW,svH,'BASE SERVICE','Nơi vận hành nghiệp vụ');
+const chipX=svX+30, chipW=svW-60;
+const chip1=chipWithTable(g,chipX,svY+80,chipW,'doc','var(--k-gold)','① QUY TRÌNH LÊN PO','Cần dữ liệu để lập KHSX',
+  'Danh sách mã hàng theo DO',
+  {headers:['MÃ HÀNG','SL TỔNG','NGÀY CẦN'],colW:[0.4,0.28,0.32],
+   rows:[['FXP-EP101','1.850','25/08'],['FXP-EP108','1.623','25/08']]});
+const chip2Y=chip1.y+chip1.h+30;
+const chip2=chipWithTable(g,chipX,chip2Y,chipW,'gear','var(--k-red)','② QUY TRÌNH SẢN XUẤT','Nhận KHSX cập nhật ngược',
+  'Kế hoạch sản xuất — n8n cập nhật NGÀY SX / SL SX',
+  {headers:['MÃ HÀNG','THIẾU','NGÀY SX','SL SX'],colW:[0.3,0.2,0.26,0.24],
+   rows:[['FXP-EP105','330','05/08','330'],['FXP-EP106','500','05/08','500']],hi:[2,3]});
+
+const gs = panelWithTable(g,1200,300,460,'sheet','var(--k-green)','GOOGLE SHEET','Kế hoạch sản xuất (KHSX)',
+  'KHSX theo ngày (người điều hành SX chỉnh tay)',
+  {headers:['MÃ HÀNG','THIẾU','NGÀY SX'],colW:[0.4,0.26,0.34],
+   rows:[['FXP-EP105','330','05/08'],['FXP-EP106','500','05/08']]});
+
+const bx=(chip1.rightX+gs.leftX)/2, by=(chip1.tableMidY+chip2.tableMidY)/2;
+twoWireWithLabel('p1b',g,g1lb,'var(--k-purple)','var(--k-purple)','var(--k-orange)',
+  'n8n · đẩy danh sách mã hàng ra Sheet để lập KHSX','n8n · Sheet cập nhật ngược ngày & SL sản xuất',
+  bx,by,
+  chip1.rightX,chip1.tableMidY, gs.leftX,gs.headerMidY,
+  gs.leftX,gs.tableMidY, chip2.rightX,chip2.tableMidY);
+})();
+const FLOW1B=[['p1b_top','var(--k-purple)',.8],['p1b_bot','var(--k-orange)',.8]];
+const CAPS1B=[
+  ['Luồng 2a','<b>Quy trình lên PO → n8n → Google Sheet</b>: đẩy danh sách mã hàng &amp; ngày cần ra Sheet để lập <i>kế hoạch sản xuất</i>.'],
+  ['Luồng 2b','<b>Google Sheet → n8n → Quy trình sản xuất</b>: ngày &amp; số lượng sản xuất từ Sheet cập nhật ngược vào KHSX.'],
+];
+
+/* ---- MAP C · Luồng 3: thay đổi đơn hàng → 2 nhánh (phiếu SX đột xuất nội bộ, hoặc cập nhật GG Sheet qua n8n) ---- */
+const g1lc=$('lyLines1c'), g1c=$('ly1c');
+(function buildFlowC(){
+const g=g1c;
+const svX=70,svY=70,svW=760,svH=560;
+serviceFrame(g,svX,svY,svW,svH,'BASE SERVICE — NƠI VẬN HÀNH NGHIỆP VỤ','Tiếp nhận thay đổi đơn hàng · kiểm tra tồn kho');
+
+const chipX=svX+40, chipW=svW-80;
+const chip1=chipWithTable(g,chipX,svY+80,chipW,'cart','var(--k-gold)','① THAY ĐỔI ĐƠN HÀNG','Khách đổi ngày giao / số lượng — [Auto] kiểm tra tồn kho',
+  'Bảng mã hàng — cần sản xuất thêm?',
+  {headers:['MÃ HÀNG','GIAO CŨ','GIAO MỚI','THIẾU'],colW:[0.28,0.24,0.24,0.24],
+   rows:[['FXP-EP101','25/08','22/08','-150'],['FXP-EP108','25/08','22/08','-77']],hi:[3]});
+const chip2Y=chip1.y+chip1.h+58;
+const chip2=chipWithTable(g,chipX,chip2Y,chipW,'wh','var(--k-red)','② TẠO PHIẾU SX ĐỘT XUẤT','Chưa có kế hoạch SX tương lai cho mã này → tạo phiếu ngay',
+  'Phiếu sản xuất đột xuất (nội bộ Base Service)',
+  {headers:['MÃ HÀNG','SL CẦN SX THÊM','NGÀY SX GẤP'],colW:[0.36,0.34,0.3],
+   rows:[['FXP-EP101','150','22/08']],hi:[1,2]});
+
+const gs = panelWithTable(g,1000,170,460,'sheet','var(--k-green)','GOOGLE SHEET','KHSX các ngày sau (kế hoạch tương lai)',
+  'Mã này đã có kế hoạch SX tương lai, chưa tạo phiếu',
+  {headers:['MÃ HÀNG','THIẾU MỚI','NGÀY SX KH'],colW:[0.36,0.32,0.32],
+   rows:[['FXP-EP108','77','05/09']],hi:[1]});
+
+/* nhánh nội bộ: chip1 -> chip2 (không qua n8n) */
+const midx1=chipX+chipW/2;
+wire('p1c_i0',g1lc,`M${midx1},${chip1.y+chip1.h} L${midx1},${chip2.y}`,{stroke:'var(--k-gold)',o:.7,w:2.4,arrow:true});
+g.appendChild(T(midx1+16,(chip1.y+chip1.h+chip2.y)/2+4,'FXP-EP101 · chưa có KH tương lai','var(--k-gold)',10,700));
+g.appendChild(T(midx1+16,(chip1.y+chip1.h+chip2.y)/2+20,'→ tạo phiếu đột xuất (nội bộ)','var(--k-gold)',10,700));
+
+/* nhánh ra ngoài: chip1 -> n8n -> Google Sheet */
+const bx=(chip1.rightX+gs.leftX)/2, by=(chip1.tableMidY+gs.tableMidY)/2;
+n8nBadge(g,bx,by,'var(--k-purple)');
+function sCurve(a,b,c,d){const mx=(a+c)/2;return `M${a},${b} C${mx},${b} ${mx},${d} ${c},${d}`;}
+wire('p1c_ext',g1lc,sCurve(chip1.rightX,chip1.tableMidY,gs.leftX,gs.tableMidY),{stroke:'var(--k-purple)',o:.7,w:2.2,arrow:true});
+g.appendChild(T(bx,by-38,'FXP-EP108 · đã có KH tương lai','var(--k-purple)',9.8,700,'middle'));
+g.appendChild(T(bx,by-22,'n8n · cập nhật lại Sheet','var(--k-purple)',9.8,700,'middle'));
+
+g.appendChild(T(svX+40,svY+svH-20,'⟳ Mỗi mã hàng được xử lý theo đúng 1 trong 2 nhánh trên, tuỳ đã có kế hoạch SX tương lai hay chưa.','var(--st3)',10,600));
+})();
+const FLOW1C=[['p1c_i0','var(--k-gold)',1.1],['p1c_ext','var(--k-purple)',.8]];
+const CAPS1C=[
+  ['Luồng 3a','<b>① Thay đổi đơn hàng → ② Tạo phiếu SX đột xuất</b> (nội bộ Base Service): mã hàng <i>chưa có</i> kế hoạch sản xuất tương lai thì tạo ngay phiếu đột xuất để bù số thiếu.'],
+  ['Luồng 3b','<b>① Thay đổi đơn hàng → n8n → Google Sheet</b>: mã hàng <i>đã có</i> kế hoạch SX tương lai nhưng chưa tạo phiếu thì n8n cập nhật lại số liệu trên Sheet — không đẩy vào Base Service.'],
+];
+
+/* ============================================================
+   TRANG 2 — KIẾN TRÚC DỮ LIỆU HIỆN TẠI (giữ đúng bố cục gốc)
+   ============================================================ */
+const g2lines=$('lyLines2'), g2=$('ly2');
+const pipeEls2=[], martEls2=[];
+(function buildPage2(){
+let g=g2;
+
+/* ---- dữ liệu ---- */
+const SRC=[
+  {n:'Base Table', s:'Tồn kho hiện tại (mã hàng · số lượng)', i:'grid', c:'var(--k-cyan)'},
+  {n:'Base Service', s:'Đơn hàng · PO · quy trình vận hành', i:'gear', c:'var(--k-gold)'},
+  {n:'Excel', s:'Dữ liệu quá khứ trước khi lên hệ thống', i:'sheet', c:'var(--k-green)'},
+];
+const PIPE=[['COLLECT','Thu thập'],['CLEAN','Làm sạch'],['VALIDATE','Kiểm tra'],
+  ['STANDARDIZE','Chuẩn hoá'],['INTEGRATE','Tích hợp'],['LOAD','Nạp vào kho']];
+const DQC=['Thiếu dữ liệu','Trùng bản ghi','Sai kiểu dữ liệu','Khớp mã gốc','Quy tắc nghiệp vụ','Đối chiếu số'];
+const SEC=[['users','Phân quyền','RBAC / ABAC'],['lock','Mã hoá','Data Encryption'],
+  ['eye','Giám sát','Audit & Logs'],['check','Tuân thủ','Compliance'],['cloud','Sao lưu','Backup & DR']];
+const MARTS=[
+  {n:'Khách hàng', c:'var(--k-pink)', i:'user'},
+  {n:'PO', c:'var(--k-orange)', i:'doc'},
+  {n:'Sản xuất', c:'var(--k-red)', i:'gear'},
+  {n:'Tồn kho', c:'var(--k-cyan)', i:'wh'},
+];
+const OUT=[
+  {n:'Khách hàng & PO', s:'Theo dõi đơn hàng, tiến độ giao, doanh thu theo khách', i:'chart', c:'var(--k-gold)'},
+  {n:'Sản xuất', s:'Kế hoạch, sản lượng thực tế, thiếu hàng cần sản xuất thêm', i:'chart', c:'var(--k-red)'},
+  {n:'Tồn kho', s:'Tồn thực tế, nhu cầu, cảnh báo thiếu theo mã hàng', i:'chart', c:'var(--k-cyan)'},
+];
+
+/* ---- toạ độ khung (giữ như bản gốc) ---- */
+const CX=340, CW=1064, BX=456;
+const MX=1184, MW=210, MH=100, MP=150, MY=110;
+const AX=1470, AW=300, AH=170, AP=225, AY=110;
+
+/* ---- cột nguồn (trái) ---- */
+g.appendChild(T(40,74,'NGUỒN DỮ LIỆU · HỆ THỐNG ĐANG DÙNG','var(--st2)',11,700));
+const sY0=100, sGap=210, sH=95;
+const srcMidY=[];
+SRC.forEach((s,i)=>{
+  const y=sY0+i*sGap;
+  card(g,40,y,268,sH,s.c);
+  g.appendChild(el('rect',{x:56,y:y+18,width:32,height:32,rx:9,fill:s.c,opacity:.16}));
+  g.appendChild(ic(s.i,72,y+34,s.c,1.05));
+  g.appendChild(T(98,y+30,s.n,'var(--st1)',13.5,800));
+  g.appendChild(T(98,y+50,s.s,'var(--st3)',9.4,500));
+  srcMidY.push(y+sH/2);
+});
+
+/* ---- khung Data Center ---- */
+g.appendChild(el('rect',{x:CX,y:22,width:CW,height:690,rx:18,fill:'none',
+  stroke:'var(--sframe)','stroke-width':1.4,'stroke-dasharray':'7 6'}));
+g.appendChild(el('rect',{x:CX+20,y:36,width:CW-40,height:50,rx:12,fill:'var(--sHeader)',stroke:'var(--k-gold)','stroke-width':1.6}));
+g.appendChild(T(CX+CW/2,59,'DATA CENTER — NỀN TẢNG DỮ LIỆU TRUNG TÂM','var(--sOnHeader)',16,800,'middle'));
+g.appendChild(T(CX+CW/2,76,'Base Table · Base Service · Excel → Data Mart','var(--sOnHeader2)',10.5,600,'middle'));
+
+function tier(y,h,grad,no,lines,railIcon){
+  g.appendChild(el('rect',{x:CX+20,y,width:734,height:h,rx:12,fill:'var(--ssoft)',stroke:'var(--sl)','stroke-width':1.1}));
+  g.appendChild(el('rect',{x:CX+20,y,width:96,height:h,rx:12,fill:grad}));
+  const cy=y+h/2, top=cy-(lines.length*14)/2-26;
+  g.appendChild(ic(railIcon,CX+68,top-4,'var(--st0)',1.05));
+  g.appendChild(T(CX+68,top+24,no,'var(--st0)',11.5,800,'middle'));
+  lines.forEach((t,i)=>g.appendChild(T(CX+68,top+42+i*14,t,'var(--st0)',9.6,700,'middle')));
+}
+
+/* ---- 01 · kết nối & xử lý ---- */
+tier(102,210,'url(#gOr)','01',['KẾT NỐI &','XỬ LÝ DỮ LIỆU','(LÀM SẠCH)'],'gear');
+g.appendChild(el('rect',{x:BX+10,y:118,width:614,height:68,rx:9,fill:'rgba(201,138,8,.08)',stroke:'var(--k-gold)','stroke-width':1.1}));
+g.appendChild(T(BX+20,140,'🔍 DATA QUALITY CHECK — kiểm soát trước khi vào kho','var(--k-gold)',10.5,800));
+DQC.forEach((d,i)=>{const x=BX+26+(i%3)*204, y=160+Math.floor(i/3)*18;
+  g.appendChild(T(x,y,'✓','var(--k-green)',10,800)); g.appendChild(T(x+13,y,d,'var(--st2)',10,500));});
+g.appendChild(T(BX+318,212,'PIPELINE KẾT NỐI & CHUẨN HOÁ DỮ LIỆU','var(--k-gold)',10.5,800,'middle'));
+PIPE.forEach((p,i)=>{
+  const x=BX+10+i*104, y=224;
+  const box=el('rect',{x,y,width:98,height:62,rx:9,fill:'var(--sc)',stroke:'var(--sl)','stroke-width':1.2});
+  g.appendChild(box);
+  g.appendChild(T(x+7,y+16,String(i+1),'var(--st3)',8.5,800));
+  g.appendChild(T(x+49,y+32,p[0],'var(--st1)',10,800,'middle'));
+  g.appendChild(T(x+49,y+47,p[1],'var(--st2)',9,500,'middle'));
+  pipeEls2.push(box);
+  if(i<5) wire('p2_pS'+i,g2lines,`M${x+98},${y+31} L${x+104},${y+31}`,{o:0});
+});
+
+/* ---- 02 · lưu trữ ---- */
+tier(330,160,'url(#gPu)','02',['LƯU TRỮ','DỮ LIỆU'],'db');
+[[BX+8,192,'lake','var(--k-cyan)','DATA LAKE','giữ nguyên bản thô'],
+ [BX+220,192,'wh','var(--k-gold)','DATA WAREHOUSE','đã chuẩn hoá · mô hình hoá'],
+ [BX+432,192,'chart','var(--k-purple)','DATA MARTS','cắt lát theo nghiệp vụ']].forEach((b,i)=>{
+  const x=b[0], w=b[1], c=b[3];
+  g.appendChild(el('rect',{x,y:350,width:w,height:120,rx:11,fill:'var(--sc)',stroke:c,'stroke-width':1.5}));
+  g.appendChild(ic(b[2]==='lake'?'db':b[2],x+w/2,386,c,1.35));
+  g.appendChild(T(x+w/2,424,b[4],'var(--st1)',13.5,800,'middle'));
+  g.appendChild(T(x+w/2,443,b[5],'var(--st2)',9.6,500,'middle'));
+  if(i<2) g.appendChild(T(x+w+10,417,'→','var(--k-gold)',19,800,'middle'));
+});
+
+/* ---- 03 · bảo mật ---- */
+tier(506,153,'url(#gBl)','03',['BẢO MẬT','DỮ LIỆU'],'shield');
+SEC.forEach((s,i)=>{
+  const x=BX+16+i*122;
+  g.appendChild(el('rect',{x,y:530,width:112,height:104,rx:10,fill:'var(--sc)',stroke:'var(--sl)','stroke-width':1.1}));
+  g.appendChild(ic(s[0],x+56,566,'var(--k-cyan)',1.2));
+  g.appendChild(T(x+56,600,s[1],'var(--st1)',11.5,700,'middle'));
+  g.appendChild(T(x+56,615,s[2],'var(--st3)',8.8,500,'middle'));
+});
+const pf=el('text',{x:CX+CW/2,y:686,'text-anchor':'middle','font-size':12.5,'font-weight':600});
+const pf1=el('tspan',{fill:'var(--st2)'}); pf1.textContent='NỀN TẢNG: ';
+const pf2=el('tspan',{fill:'var(--k-gold)','font-weight':800}); pf2.textContent='BigQuery · Snowflake · Redshift · SQL Server';
+pf.appendChild(pf1); pf.appendChild(pf2); g.appendChild(pf);
+
+/* ---- cột Data Mart (trong khung, phải) — 4 mart ---- */
+const martMidY=[];
+MARTS.forEach((m,i)=>{
+  const y=MY+i*MP;
+  const box=el('rect',{x:MX,y,width:MW,height:MH,rx:11,fill:'var(--sc)',stroke:m.c,'stroke-width':1.4});
+  g.appendChild(box);
+  g.appendChild(el('rect',{x:MX,y,width:5,height:MH,rx:2.5,fill:m.c}));
+  g.appendChild(el('rect',{x:MX+14,y:y+18,width:30,height:30,rx:8,fill:m.c,opacity:.16}));
+  g.appendChild(ic(m.i,MX+29,y+33,m.c,.98));
+  g.appendChild(T(MX+54,y+31,m.n.toUpperCase(),'var(--st1)',12.5,800));
+  g.appendChild(T(MX+54,y+48,'data mart','var(--st3)',9,500));
+  martEls2.push(box); martMidY.push(y+MH/2);
+});
+
+/* ---- cột báo cáo (phải, ngoài khung) — 3 lát cắt, không phân quyền ---- */
+g.appendChild(el('rect',{x:AX,y:54,width:AW,height:30,rx:8,fill:'var(--sHeader)'}));
+g.appendChild(T(AX+AW/2,74,'BÁO CÁO QUẢN TRỊ · 3 LÁT CẮT','var(--sOnHeader)',10.8,800,'middle'));
+const outMidY=[];
+OUT.forEach((o,i)=>{
+  const y=AY+i*AP;
+  const box=el('rect',{x:AX,y,width:AW,height:AH,rx:12,fill:'var(--sc2)',stroke:o.c,'stroke-width':1.4});
+  g.appendChild(box);
+  g.appendChild(el('rect',{x:AX+16,y:y+18,width:36,height:36,rx:10,fill:o.c,opacity:.16}));
+  g.appendChild(ic(o.i,AX+34,y+36,o.c,1.15));
+  g.appendChild(T(AX+62,y+30,'BÁO CÁO','var(--st3)',9.2,700));
+  g.appendChild(T(AX+62,y+50,o.n,'var(--st1)',14,800));
+  g.appendChild(T(AX+18,y+84,o.s,'var(--st2)',9.8,500));
+  outMidY.push(y+AH/2);
+});
+
+/* ---- dây nối ---- */
+SRC.forEach((s,i)=>{ const y=srcMidY[i];
+  wire('p2_s'+i,g2lines, `M308,${y} C356,${y} 400,${150+i*3} ${BX+6},${146+i*4}`, {stroke:s.c,o:.4,w:1.4}); });
+wire('p2_q2p',g2lines, `M${BX+59},186 L${BX+59},224`,{stroke:'var(--k-green)'});
+wire('p2_p2l',g2lines, `M${BX+628},255 C${BX+672},306 ${BX+250},316 ${BX+104},350`,{stroke:'var(--k-cyan)'});
+wire('p2_l2w',g2lines, `M${BX+200},410 L${BX+218},410`,{stroke:'var(--k-cyan)'});
+wire('p2_w2m',g2lines, `M${BX+412},410 L${BX+430},410`,{stroke:'var(--k-purple)'});
+MARTS.forEach((m,i)=>{ const my=martMidY[i];
+  wire('p2_m'+i,g2lines, `M${BX+624},410 C${MX-104},410 ${MX-72},${my} ${MX-2},${my}`,{stroke:m.c,dash:'5 6',o:.35}); });
+OUT.forEach((o,i)=>{ const ay=outMidY[i];
+  wire('p2_o'+i,g2lines, `M${MX+MW},380 C${MX+MW+40},380 ${AX-40},${ay} ${AX-2},${ay}`,{stroke:o.c,dash:'5 6',o:.42,arrow:true}); });
+})();
+
+const FLOW2=[];
+['0','1','2'].forEach(i=>FLOW2.push(['p2_s'+i,'var(--st2)',.34]));
+FLOW2.push(['p2_q2p','var(--k-green)',1.0],['p2_p2l','var(--k-cyan)',.42],
+  ['p2_l2w','var(--k-cyan)',.52],['p2_w2m','var(--k-purple)',.52]);
+for(let i=0;i<5;i++) FLOW2.push(['p2_pS'+i,'var(--k-gold)',1.5]);
+for(let i=0;i<4;i++) FLOW2.push(['p2_m'+i,'var(--k-cyan)',.5]);
+for(let i=0;i<3;i++) FLOW2.push(['p2_o'+i,'var(--k-gold)',.5]);
+
+const CAPS2=[
+  ['3|nguồn dữ liệu','<b>Base Table</b> (tồn kho) · <b>Base Service</b> (đơn hàng · PO · vận hành) · <b>Excel</b> (dữ liệu quá khứ) — được kết nối về <i>một nền tảng duy nhất</i>.'],
+  ['6|bước xử lý','<b>Pipeline</b>: thu thập → làm sạch → kiểm tra → chuẩn hoá → tích hợp → nạp kho. Không đạt <i>Data Quality Check</i> thì không được vào kho.'],
+  ['3|lớp lưu trữ','<b>Data Lake</b> giữ nguyên bản thô · <b>Data Warehouse</b> đã chuẩn hoá dùng chung · <b>Data Mart</b> cắt lát theo nghiệp vụ.'],
+  ['4|Data Mart','<b>Khách hàng · PO · Sản xuất · Tồn kho</b> — 4 lát dữ liệu chính, nằm ngay <i>trong Data Center</i>.'],
+  ['3|lát cắt báo cáo','Khai thác ra <b>3 báo cáo quản trị</b>: Khách hàng &amp; PO · Sản xuất · Tồn kho — bản demo này <i>không có phần phân quyền</i> chi tiết.'],
+];
+
+/* ================= ĐIỀU KHIỂN TRANG & HIỆU ỨNG ================= */
+let curPage='p1', curSub='a', busy={}, cool={};
+function cap(k,t){const p=k.split('|');$('capK').innerHTML=p[0]+'<small>'+(p[1]||'&nbsp;')+'</small>';$('capT').innerHTML=t;}
+function flowTick(FLOW){
+  const now=performance.now();
+  FLOW.forEach(([id,c,sp])=>{
+    if(busy[id]) return; if(now<(cool[id]||0)) return; busy[id]=1;
+    dot(id,c,sp,()=>{busy[id]=0;cool[id]=performance.now()+650+Math.random()*500;},4.2);
+  });
+}
+let ci=0,ct=99,raf=null,last=0;
+function activeFlow(){
+  if(curPage==='p2') return FLOW2;
+  return {a:FLOW1A,b:FLOW1B,c:FLOW1C}[curSub];
+}
+function activeCaps(){
+  if(curPage==='p2') return CAPS2;
+  return {a:CAPS1A,b:CAPS1B,c:CAPS1C}[curSub];
+}
+function tick(ts){
+  const dt=Math.min(.05,(ts-last)/1000)||0; last=ts;
+  if(curPage==='p3'){ raf=requestAnimationFrame(tick); return; }
+  for(let i=parts.length-1;i>=0;i--){
+    const p=parts[i]; p.t+=p.speed*dt;
+    if(p.t>=1){p.node.remove();parts.splice(i,1);if(p.onEnd)p.onEnd();continue;}
+    const pt=at(p.id,p.t); p.node.setAttribute('cx',pt.x); p.node.setAttribute('cy',pt.y);
+  }
+  flowTick(activeFlow());
+  ct+=dt; if(ct>5.6){ct=0; const C=activeCaps(); cap(C[ci%C.length][0],C[ci%C.length][1]); ci++;}
+  raf=requestAnimationFrame(tick);
+}
+function start(){
+  clearFx(); busy={}; cool={}; ci=0; ct=99;
+  const C=activeCaps(); cap(C[0][0],C[0][1]); ci=1;
+}
+function showSub(s){
+  curSub=s;
+  document.querySelectorAll('#subnav1 button').forEach(b=>b.classList.toggle('on',b.getAttribute('data-sub')===s));
+  ['a','b','c'].forEach(k=>{
+    const on=(s===k);
+    $('lyLines1'+k).classList.toggle('hidden',!on);
+    $('ly1'+k).classList.toggle('hidden',!on);
+  });
+  start();
+}
+function showPage(p){
+  curPage=p;
+  document.querySelectorAll('#nav button').forEach(b=>b.classList.toggle('on',b.getAttribute('data-page')===p));
+  const isReport = p==='p3';
+  $('stageWrap').classList.toggle('hidden',isReport);
+  $('capWrap').classList.toggle('hidden',isReport);
+  $('footWrap').classList.toggle('hidden',isReport);
+  $('reportPanel').classList.toggle('hidden',!isReport);
+  $('subnav1').classList.toggle('hidden',p!=='p1');
+  $('lyLines2').classList.toggle('hidden',p!=='p2');
+  $('ly2').classList.toggle('hidden',p!=='p2');
+  if(p==='p1'){
+    showSub(curSub);
+  } else {
+    ['a','b','c'].forEach(k=>{ $('lyLines1'+k).classList.add('hidden'); $('ly1'+k).classList.add('hidden'); });
+  }
+  if(isReport){ clearFx(); return; }
+  $('pageNote').textContent = p==='p1'
+    ? 'Sơ đồ minh hoạ luồng tự động hoá vận hành giữa Base Service, Base Table và Google Sheet qua n8n.'
+    : 'Sơ đồ minh hoạ kiến trúc dữ liệu hiện tại — từ nguồn đến data mart đến báo cáo quản trị.';
+  start();
+}
+document.querySelectorAll('#nav button').forEach(b=>{
+  b.addEventListener('click',()=>showPage(b.getAttribute('data-page')));
+});
+document.querySelectorAll('#subnav1 button').forEach(b=>{
+  b.addEventListener('click',()=>showSub(b.getAttribute('data-sub')));
+});
+$('replay').addEventListener('click',start);
+showPage('p1');
+last=performance.now(); raf=requestAnimationFrame(tick);
+})();
+</script>
+</body>
+</html>
