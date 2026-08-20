@@ -308,36 +308,36 @@ const tb = panelWithTable(g,100,310,460,'grid','var(--k-cyan)','BASE TABLE','Lư
 const svX=1160,svY=60,svW=540,svH=700;
 serviceFrame(g,svX,svY,svW,svH,'BASE SERVICE','Nơi xác nhận, xuất & nhập kho theo đơn hàng');
 const chipX=svX+30, chipW=svW-60;
-const chip1=chipWithTable(g,chipX,svY+72,chipW,'doc','var(--k-gold)','① QUY TRÌNH LÊN PO','Cần tồn kho để xác nhận đơn hàng',
+const chip1=chipWithTable(g,chipX,svY+72,chipW,'doc','var(--k-gold)','QT1 · TIẾP NHẬN DO & LÊN KHSX','Cần tồn kho để xác nhận đơn hàng',
   'Bảng kiểm tra KHSX — n8n điền cột TỒN KHO',
   {headers:['MÃ HÀNG','SL TỔNG','TỒN KHO','THIẾU'],colW:[0.3,0.24,0.24,0.22],
    rows:[['FXP-EP101','1.850','1.900','-50'],['FXP-EP108','1.623','1.600','23']],hi:[2]});
 const chip2Y=chip1.y+chip1.h+18;
-const chip2=chipWithTable(g,chipX,chip2Y,chipW,'wh','var(--k-orange)','② QUY TRÌNH XUẤT KHO','Xuất kho theo phiếu, làm thay đổi số tồn',
-  'Bảng mã hàng cần giao — nguồn trừ tồn kho',
-  {headers:['MÃ HÀNG','SL CẦN GIAO'],colW:[0.6,0.4],
-   rows:[['FXP-EP101','1.850'],['FXP-EP108','1.623']]});
-const chip3Y=chip2.y+chip2.h+18;
-const chip3=chipWithTable(g,chipX,chip3Y,chipW,'wh','var(--k-teal)','③ QUY TRÌNH SẢN XUẤT','Sản xuất xong → nhập kho, cộng vào tồn',
+const chip2=chipWithTable(g,chipX,chip2Y,chipW,'wh','var(--k-teal)','QT2 · THEO DÕI SẢN XUẤT','Sản xuất xong → nhập kho, cộng vào tồn',
   'Sản lượng hoàn thành — n8n cộng vào tồn kho',
   {headers:['MÃ HÀNG','SL SẢN XUẤT','NHẬP KHO'],colW:[0.38,0.3,0.32],
    rows:[['FXP-EP105','330','+330'],['FXP-EP106','500','+500']],hi:[2]});
+const chip3Y=chip2.y+chip2.h+18;
+const chip3=chipWithTable(g,chipX,chip3Y,chipW,'wh','var(--k-orange)','QT4 · XUẤT KHO','Xuất kho theo phiếu, làm thay đổi số tồn',
+  'Bảng mã hàng cần giao — nguồn trừ tồn kho',
+  {headers:['MÃ HÀNG','SL CẦN GIAO'],colW:[0.6,0.4],
+   rows:[['FXP-EP101','1.850'],['FXP-EP108','1.623']]});
 
 const bx=(tb.rightX+chip1.leftX)/2, by=chip2.tableMidY;
 n8nBadge(g,bx,by,'var(--k-purple)');
 function sCurve(a,b,c,d){const mx=(a+c)/2;return `M${a},${b} C${mx},${b} ${mx},${d} ${c},${d}`;}
 wire('p1a_top',g1la,sCurve(tb.rightX,tb.headerMidY,chip1.leftX,chip1.tableMidY),{stroke:'var(--k-cyan)',o:.7,w:2.2,arrow:true});
-wire('p1a_bot',g1la,sCurve(chip2.leftX,chip2.tableMidY,tb.rightX,tb.tableMidY),{stroke:'var(--k-green)',o:.7,w:2.2,arrow:true});
-wire('p1a_bot2',g1la,sCurve(chip3.leftX,chip3.tableMidY,tb.rightX,tb.tblBottom-15),{stroke:'var(--k-teal)',o:.7,w:2.2,arrow:true});
+wire('p1a_bot',g1la,sCurve(chip2.leftX,chip2.tableMidY,tb.rightX,tb.tableMidY),{stroke:'var(--k-teal)',o:.7,w:2.2,arrow:true});
+wire('p1a_bot2',g1la,sCurve(chip3.leftX,chip3.tableMidY,tb.rightX,tb.tblBottom-15),{stroke:'var(--k-green)',o:.7,w:2.2,arrow:true});
 g.appendChild(T(bx,by-150,'n8n · điền tồn kho vào bảng KHSX','var(--k-cyan)',10.2,700,'middle'));
 g.appendChild(T(bx,by+150,'n8n · xuất kho & nhập kho tự động','var(--k-green)',10.2,700,'middle'));
 g.appendChild(T(bx,by+166,'cập nhật lại tồn kho','var(--k-green)',10.2,700,'middle'));
 })();
-const FLOW1A=[['p1a_top','var(--k-cyan)',.8],['p1a_bot','var(--k-green)',.8],['p1a_bot2','var(--k-teal)',.8]];
+const FLOW1A=[['p1a_top','var(--k-cyan)',.8],['p1a_bot','var(--k-teal)',.8],['p1a_bot2','var(--k-green)',.8]];
 const CAPS1A=[
-  ['Luồng 1a','<b>Base Table → n8n → Quy trình lên PO</b>: n8n điền số <i>tồn kho</i> vào bảng KHSX để tính được số thiếu, phục vụ xác nhận đơn.'],
-  ['Luồng 1b','<b>Quy trình xuất kho → n8n → Base Table</b>: sau khi lập phiếu <i>xuất kho</i>, n8n trừ ngược số lượng đã giao vào tồn kho.'],
-  ['Luồng 1c','<b>Quy trình sản xuất → n8n → Base Table</b>: sau khi sản xuất xong và <i>nhập kho</i>, n8n cộng số lượng nhập vào tồn kho.'],
+  ['Luồng 1a','<b>Base Table → n8n → QT1 (Tiếp nhận DO &amp; lên KHSX)</b>: n8n điền số <i>tồn kho</i> vào bảng KHSX để tính được số thiếu, phục vụ xác nhận đơn.'],
+  ['Luồng 1b','<b>QT2 (Theo dõi sản xuất) → n8n → Base Table</b>: sau khi sản xuất xong và <i>nhập kho</i>, n8n cộng số lượng nhập vào tồn kho.'],
+  ['Luồng 1c','<b>QT4 (Xuất kho) → n8n → Base Table</b>: sau khi lập phiếu <i>xuất kho</i>, n8n trừ ngược số lượng đã giao vào tồn kho.'],
 ];
 
 /* ---- MAP B · Luồng 2: kế hoạch sản xuất — 2 quy trình trong Base Service ⇄ n8n ⇄ Google Sheet ---- */
@@ -347,12 +347,12 @@ const g=g1b;
 const svX=100,svY=110,svW=540,svH=500;
 serviceFrame(g,svX,svY,svW,svH,'BASE SERVICE','Nơi vận hành nghiệp vụ');
 const chipX=svX+30, chipW=svW-60;
-const chip1=chipWithTable(g,chipX,svY+80,chipW,'doc','var(--k-gold)','① QUY TRÌNH LÊN PO','Cần dữ liệu để lập KHSX',
+const chip1=chipWithTable(g,chipX,svY+80,chipW,'doc','var(--k-gold)','QT1 · TIẾP NHẬN DO & LÊN KHSX','Cần dữ liệu để lập KHSX',
   'Danh sách mã hàng theo DO',
   {headers:['MÃ HÀNG','SL TỔNG','NGÀY CẦN'],colW:[0.4,0.28,0.32],
    rows:[['FXP-EP101','1.850','25/08'],['FXP-EP108','1.623','25/08']]});
 const chip2Y=chip1.y+chip1.h+30;
-const chip2=chipWithTable(g,chipX,chip2Y,chipW,'gear','var(--k-red)','② QUY TRÌNH SẢN XUẤT','Nhận KHSX cập nhật ngược',
+const chip2=chipWithTable(g,chipX,chip2Y,chipW,'gear','var(--k-red)','QT2 · THEO DÕI SẢN XUẤT','Nhận KHSX cập nhật ngược',
   'Kế hoạch sản xuất — n8n cập nhật NGÀY SX / SL SX',
   {headers:['MÃ HÀNG','THIẾU','NGÀY SX','SL SX'],colW:[0.3,0.2,0.26,0.24],
    rows:[['FXP-EP105','330','05/08','330'],['FXP-EP106','500','05/08','500']],hi:[2,3]});
@@ -371,53 +371,51 @@ twoWireWithLabel('p1b',g,g1lb,'var(--k-purple)','var(--k-purple)','var(--k-orang
 })();
 const FLOW1B=[['p1b_top','var(--k-purple)',.8],['p1b_bot','var(--k-orange)',.8]];
 const CAPS1B=[
-  ['Luồng 2a','<b>Quy trình lên PO → n8n → Google Sheet</b>: đẩy danh sách mã hàng &amp; ngày cần ra Sheet để lập <i>kế hoạch sản xuất</i>.'],
-  ['Luồng 2b','<b>Google Sheet → n8n → Quy trình sản xuất</b>: ngày &amp; số lượng sản xuất từ Sheet cập nhật ngược vào KHSX.'],
+  ['Luồng 2a','<b>QT1 (Tiếp nhận DO &amp; lên KHSX) → n8n → Google Sheet</b>: đẩy danh sách mã hàng &amp; ngày cần ra Sheet để lập <i>kế hoạch sản xuất</i>.'],
+  ['Luồng 2b','<b>Google Sheet → n8n → QT2 (Theo dõi sản xuất)</b>: ngày &amp; số lượng sản xuất từ Sheet cập nhật ngược vào KHSX.'],
 ];
 
-/* ---- MAP C · Luồng 3: thay đổi đơn hàng → 2 nhánh (phiếu SX đột xuất nội bộ, hoặc cập nhật GG Sheet qua n8n) ---- */
+/* ---- MAP C · Luồng 3: QT3 nhận thay đổi từ KH → kiểm tra tồn kho → 2 khả năng ---- */
 const g1lc=$('lyLines1c'), g1c=$('ly1c');
 (function buildFlowC(){
 const g=g1c;
-const svX=70,svY=70,svW=760,svH=560;
-serviceFrame(g,svX,svY,svW,svH,'BASE SERVICE — NƠI VẬN HÀNH NGHIỆP VỤ','Tiếp nhận thay đổi đơn hàng · kiểm tra tồn kho');
+const svX=90,svY=90,svW=640,svH=520;
+serviceFrame(g,svX,svY,svW,svH,'BASE SERVICE','QT3 tiếp nhận thay đổi từ khách hàng');
 
 const chipX=svX+40, chipW=svW-80;
-const chip1=chipWithTable(g,chipX,svY+80,chipW,'cart','var(--k-gold)','① THAY ĐỔI ĐƠN HÀNG','Khách đổi ngày giao / số lượng — [Auto] kiểm tra tồn kho',
-  'Bảng mã hàng — cần sản xuất thêm?',
+const chip1=chipWithTable(g,chipX,svY+80,chipW,'cart','var(--k-gold)','QT3 · THAY ĐỔI KHGH THEO YÊU CẦU KH','Tiếp nhận thay đổi từ KH → [Auto] kiểm tra tồn kho',
+  'Bảng mã hàng — kiểm tra tồn kho theo yêu cầu mới',
   {headers:['MÃ HÀNG','GIAO CŨ','GIAO MỚI','THIẾU'],colW:[0.28,0.24,0.24,0.24],
-   rows:[['FXP-EP101','25/08','22/08','-150'],['FXP-EP108','25/08','22/08','-77']],hi:[3]});
-const chip2Y=chip1.y+chip1.h+58;
-const chip2=chipWithTable(g,chipX,chip2Y,chipW,'wh','var(--k-red)','② TẠO PHIẾU SX ĐỘT XUẤT','Chưa có kế hoạch SX tương lai cho mã này → tạo phiếu ngay',
-  'Phiếu sản xuất đột xuất (nội bộ Base Service)',
-  {headers:['MÃ HÀNG','SL CẦN SX THÊM','NGÀY SX GẤP'],colW:[0.36,0.34,0.3],
-   rows:[['FXP-EP101','150','22/08']],hi:[1,2]});
+   rows:[['FXP-EP101','25/08','22/08','-150'],['FXP-EP108','25/08','22/08','-77'],['FXP-EP111','26/08','24/08','60']],hi:[3]});
 
-const gs = panelWithTable(g,1000,170,460,'sheet','var(--k-green)','GOOGLE SHEET','KHSX các ngày sau (kế hoạch tương lai)',
-  'Mã này đã có kế hoạch SX tương lai, chưa tạo phiếu',
-  {headers:['MÃ HÀNG','THIẾU MỚI','NGÀY SX KH'],colW:[0.36,0.32,0.32],
-   rows:[['FXP-EP108','77','05/09']],hi:[1]});
+const doneY=chip1.y+chip1.h+24;
+const chipDone=chipWithTable(g,chipX,doneY,chipW,'wh','var(--k-orange)','QT4 · XUẤT KHO','Đủ hàng theo yêu cầu mới → xuất kho luôn',
+  'Bảng mã hàng cần giao (đủ hàng, không cần đổi KHSX)',
+  {headers:['MÃ HÀNG','SL CẦN GIAO','NGÀY GIAO MỚI'],colW:[0.34,0.3,0.36],
+   rows:[['FXP-EP111','590','24/08']]});
 
-/* nhánh nội bộ: chip1 -> chip2 (không qua n8n) */
 const midx1=chipX+chipW/2;
-wire('p1c_i0',g1lc,`M${midx1},${chip1.y+chip1.h} L${midx1},${chip2.y}`,{stroke:'var(--k-gold)',o:.7,w:2.4,arrow:true});
-g.appendChild(T(midx1+16,(chip1.y+chip1.h+chip2.y)/2+4,'FXP-EP101 · chưa có KH tương lai','var(--k-gold)',10,700));
-g.appendChild(T(midx1+16,(chip1.y+chip1.h+chip2.y)/2+20,'→ tạo phiếu đột xuất (nội bộ)','var(--k-gold)',10,700));
+wire('p1c_i0',g1lc,`M${midx1},${chip1.y+chip1.h} L${midx1},${doneY}`,{stroke:'var(--k-green)',o:.7,w:2.2,arrow:true});
+g.appendChild(T(midx1+16,(chip1.y+chip1.h+doneY)/2+4,'FXP-EP111 · đủ hàng','var(--k-green)',9.8,700));
 
-/* nhánh ra ngoài: chip1 -> n8n -> Google Sheet */
-const bx=(chip1.rightX+gs.leftX)/2, by=(chip1.tableMidY+gs.tableMidY)/2;
+const gs = panelWithTable(g,930,90,460,'sheet','var(--k-purple)','GOOGLE SHEET','KHSX mới nhất',
+  'Đến ngày, Sheet sẽ tạo phiếu sang QT2 theo KH mới',
+  {headers:['MÃ HÀNG','THIẾU','NGÀY SX MỚI'],colW:[0.34,0.28,0.38],
+   rows:[['FXP-EP101','150','22/08'],['FXP-EP108','77','22/08']],hi:[1,2]});
+
+const bx=(chip1.rightX+gs.leftX)/2, by=chip1.tableMidY;
 n8nBadge(g,bx,by,'var(--k-purple)');
 function sCurve(a,b,c,d){const mx=(a+c)/2;return `M${a},${b} C${mx},${b} ${mx},${d} ${c},${d}`;}
 wire('p1c_ext',g1lc,sCurve(chip1.rightX,chip1.tableMidY,gs.leftX,gs.tableMidY),{stroke:'var(--k-purple)',o:.7,w:2.2,arrow:true});
-g.appendChild(T(bx,by-38,'FXP-EP108 · đã có KH tương lai','var(--k-purple)',9.8,700,'middle'));
-g.appendChild(T(bx,by-22,'n8n · cập nhật lại Sheet','var(--k-purple)',9.8,700,'middle'));
+g.appendChild(T(bx,by-42,'FXP-EP101, FXP-EP108 · thiếu hàng','var(--k-purple)',9.8,700,'middle'));
+g.appendChild(T(bx,by-26,'n8n · đẩy nhanh KHSX lên Sheet','var(--k-purple)',9.8,700,'middle'));
 
-g.appendChild(T(svX+40,svY+svH-20,'⟳ Mỗi mã hàng được xử lý theo đúng 1 trong 2 nhánh trên, tuỳ đã có kế hoạch SX tương lai hay chưa.','var(--st3)',10,600));
+g.appendChild(T(svX+40,svY+svH-18,'⟳ Đủ hàng → chuyển thẳng sang QT4 (nội bộ). Thiếu hàng → n8n cập nhật KHSX lên Sheet.','var(--st3)',10,600));
 })();
-const FLOW1C=[['p1c_i0','var(--k-gold)',1.1],['p1c_ext','var(--k-purple)',.8]];
+const FLOW1C=[['p1c_i0','var(--k-green)',1.1],['p1c_ext','var(--k-purple)',.8]];
 const CAPS1C=[
-  ['Luồng 3a','<b>① Thay đổi đơn hàng → ② Tạo phiếu SX đột xuất</b> (nội bộ Base Service): mã hàng <i>chưa có</i> kế hoạch sản xuất tương lai thì tạo ngay phiếu đột xuất để bù số thiếu.'],
-  ['Luồng 3b','<b>① Thay đổi đơn hàng → n8n → Google Sheet</b>: mã hàng <i>đã có</i> kế hoạch SX tương lai nhưng chưa tạo phiếu thì n8n cập nhật lại số liệu trên Sheet — không đẩy vào Base Service.'],
+  ['Luồng 3a','<b>QT3 (Thay đổi KHGH) → QT4 (Xuất kho)</b>: nếu <i>đủ hàng</i> để xuất kho theo yêu cầu mới, chuyển thẳng sang QT4 — không cần cập nhật kế hoạch sản xuất.'],
+  ['Luồng 3b','<b>QT3 → n8n → Google Sheet</b>: nếu <i>thiếu hàng</i>, cần đẩy nhanh kế hoạch sản xuất, n8n cập nhật KHSX mới lên Sheet — đến ngày sẽ tự tạo phiếu sang QT2 (Theo dõi sản xuất) đúng theo kế hoạch mới nhất.'],
 ];
 
 /* ============================================================
