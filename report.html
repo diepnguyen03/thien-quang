@@ -63,6 +63,7 @@ body{background:#F4F6FA;color:var(--tx-primary);font-family:'Inter',-apple-syste
 
 /* KPI */
 .kpi-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(185px,1fr));gap:12px;margin-bottom:14px}
+@media(max-width:640px){.kpi-grid{grid-template-columns:repeat(auto-fit,minmax(150px,1fr))!important}}
 .kpi{background:var(--bg-primary);border:0.5px solid var(--border-t);border-radius:var(--r-lg);padding:14px 15px;position:relative}
 .kpi .chg{position:absolute;top:12px;right:13px;font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:999px;display:inline-flex;align-items:center;gap:3px}
 .kpi .chg.u{color:var(--tx-success);background:var(--bg-success)}
@@ -387,6 +388,8 @@ const ICON_SVG={
   'filter':'<svg viewBox="0 0 24 24" '+SVGW+'><path d="M4 5h16l-6 7v6l-4 2v-8Z"/></svg>',
   'rotate':'<svg viewBox="0 0 24 24" '+SVGW+'><path d="M20 11A8 8 0 0 0 6 6.3L4 8"/><path d="M4 4v4h4"/><path d="M4 13a8 8 0 0 0 14 4.7l2-1.7"/><path d="M20 20v-4h-4"/></svg>',
   'search':'<svg viewBox="0 0 24 24" '+SVGW+'><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>',
+  'users':'<svg viewBox="0 0 24 24" '+SVGW+'><circle cx="9" cy="8" r="3"/><path d="M3.5 20c0-3 2.5-5.5 5.5-5.5s5.5 2.5 5.5 5.5"/><circle cx="17" cy="9" r="2.3"/><path d="M15 20c0-2.2 1.2-4 2.8-4.7"/></svg>',
+  'truck':'<svg viewBox="0 0 24 24" '+SVGW+'><path d="M2 7h11v9H2z"/><path d="M13 11h4l3.5 3.2V16H13z"/><circle cx="6.5" cy="18" r="1.6"/><circle cx="16.5" cy="18" r="1.6"/></svg>',
 };
 function ic(name){ return '<i class="icn">'+(ICON_SVG[name]||'')+'</i>'; }
 document.querySelectorAll('[data-icon]').forEach(e=>{ e.innerHTML=ICON_SVG[e.dataset.icon]||''; });
@@ -409,6 +412,16 @@ function kpiCard(icon,ttl,big,unit,chg,sub){
   return '<div class="kpi">'+(chg||'')+'<div class="ic">'+ic(icon)+'</div>'
   +'<div class="ttl">'+ttl+'</div><div class="big">'+big+' <small>'+unit+'</small></div>'
   +(sub?'<div class="subtxt">'+sub+'</div>':'')+'</div>';
+}
+// Chọn số cột sao cho không có 1 card lẻ bị dồn xuống hàng riêng (áp dụng ở màn hình rộng; mobile có media query riêng)
+function fitKpiCols(id){
+  const cont=el(id); if(!cont) return;
+  const n=cont.children.length; if(!n) return;
+  let cols;
+  if(n<=4){ cols=n; }
+  else if(n%4!==1){ cols=4; }
+  else { cols=4; for(const c of [3,5,2]){ if(n%c!==1){ cols=c; break; } } }
+  cont.style.gridTemplateColumns='repeat('+cols+', minmax(185px, 1fr))';
 }
 const MONTHS=RAW.months;
 const cumu=a=>{let s=0;return a.map(v=>Math.round((s+=v)*100)/100);};
@@ -493,14 +506,19 @@ function renderDH(){
   }
 
   const totRemaining=pos.reduce((a,p)=>a+remainingQty(p),0);
+  const custCount=new Set(pos.map(p=>p.khid)).size;
+  const doCount=pos.reduce((a,p)=>a+p.dos.length,0);
 
   el('dhKpi').innerHTML=
-    kpiCard('invoice','Tổng số PO',fmt0(pos.length),'PO',null,'Đang theo dõi')
+    kpiCard('users','Số lượng khách hàng',fmt0(custCount),'KH',null,'Đang theo dõi')
+    +kpiCard('invoice','Tổng số PO',fmt0(pos.length),'PO',null,'Đang theo dõi')
+    +kpiCard('truck','Số lượng DO',fmt0(doCount),'DO',null,'Lô giao hàng')
     +kpiCard('package','Tổng sản lượng',fmt0(totQty),'pcs',delta(qtyChg),'Theo PO')
     +kpiCard('cash','Tổng doanh thu',fmt0(totAmt),'USD',delta(amtChg),'Giá trị PO')
     +kpiCard('alert-triangle','Chậm tiến độ',fmt0(lateN),'PO',null,lateN?'Cần xử lý':'Không có')
     +kpiCard('calendar-due','Đến hạn ≤ 7 ngày',fmt0(due7N),'PO',null,'Cần đẩy nhanh')
     +kpiCard('flame','Sản lượng còn lại',fmt0(totRemaining),'pcs',null,'Chưa giao hết');
+  fitKpiCols('dhKpi');
 
   // Donuts theo khách hàng
   const revByC=CUSTOMERS.map(c=>({name:c.short,c:c.color,v:pos.filter(p=>p.khid===c.id).reduce((a,p)=>a+p.amt,0)})).filter(d=>d.v>0);
@@ -651,6 +669,7 @@ function renderKho(){
     +kpiCard('package-off','SKU thiếu hàng',fmt0(shortSku),'SKU',null,shortSku?'So với nhu cầu PO':'Không có')
     +kpiCard('stack-2','Tổng số lượng thiếu',fmt0(totShort),'pcs',null,'Cộng dồn')
     +kpiCard('flame','SKU cần SX gấp',fmt0(urgentSku),'SKU',null,urgentSku?'Thiếu ≥ 30% nhu cầu':'Không có');
+  fitKpiCols('khoKpi');
 
   // Top 10 chart
   const top10=inv.slice().sort((a,b)=>b.shortage-a.shortage).filter(r=>r.shortage>0).slice(0,10);
@@ -705,6 +724,7 @@ function renderSx(){
     +kpiCard('circle-check','% đạt kế hoạch TB',avgPct.toFixed(1),'%',null,'So với kế hoạch ngày')
     +kpiCard('calendar-due','Ngày đạt kế hoạch',daysMet+'/'+windowData.length,'ngày',null,'Thực tế ≥ kế hoạch')
     +kpiCard('package','Sản lượng gần nhất',lastDay?fmt0(lastDay.actual):'—','pcs',null,lastDay?fmtD(lastDay.date):'');
+  fitKpiCols('sxKpi');
 
   const labels=windowData.map(r=>{ const d=new Date(r.date+'T00:00:00'); return d.getDate()+'/'+(d.getMonth()+1); });
   const actualArr=windowData.map(r=>r.actual);
