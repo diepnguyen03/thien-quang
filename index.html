@@ -89,6 +89,7 @@ font-weight:700;font-size:14px;text-decoration:none;transition:.15s;display:inli
 <button class="on" data-sub="a">Luồng 1 · Đồng bộ tồn kho</button>
 <button data-sub="b">Luồng 2 · Kế hoạch sản xuất</button>
 <button data-sub="c">Luồng 3 · Đơn hàng thay đổi</button>
+<button data-sub="d">Luồng 4 · Danh sách xuất kho</button>
 </div>
 
 <div class="stage" id="stageWrap">
@@ -105,6 +106,7 @@ font-weight:700;font-size:14px;text-decoration:none;transition:.15s;display:inli
 <g id="lyLines1a" class="pagegrp"></g><g id="ly1a" class="pagegrp"></g>
 <g id="lyLines1b" class="pagegrp hidden"></g><g id="ly1b" class="pagegrp hidden"></g>
 <g id="lyLines1c" class="pagegrp hidden"></g><g id="ly1c" class="pagegrp hidden"></g>
+<g id="lyLines1d" class="pagegrp hidden"></g><g id="ly1d" class="pagegrp hidden"></g>
 <g id="lyLines2" class="pagegrp hidden"></g><g id="ly2" class="pagegrp hidden"></g>
 <g id="fx"></g>
 </svg>
@@ -418,6 +420,41 @@ const CAPS1C=[
   ['Luồng 3b','<b>QT3 → n8n → Google Sheet</b>: nếu <i>thiếu hàng</i>, cần đẩy nhanh kế hoạch sản xuất, n8n cập nhật KHSX mới lên Sheet — đến ngày sẽ tự tạo phiếu sang QT2 (Theo dõi sản xuất) đúng theo kế hoạch mới nhất.'],
 ];
 
+/* ---- MAP D · Luồng 4: danh sách đơn hàng xuất kho hàng ngày — QT1 ⇄ n8n ⇄ Google Sheet ⇄ n8n ⇄ QT5 ---- */
+const g1ld=$('lyLines1d'), g1d=$('ly1d');
+(function buildFlowD(){
+const g=g1d;
+const svX=100,svY=110,svW=540,svH=500;
+serviceFrame(g,svX,svY,svW,svH,'BASE SERVICE','Nơi vận hành nghiệp vụ');
+const chipX=svX+30, chipW=svW-60;
+const chip1=chipWithTable(g,chipX,svY+80,chipW,'doc','var(--k-gold)','QT1 · TIẾP NHẬN DO & LÊN KHSX','Tổng hợp đơn hàng cần xuất kho hôm nay',
+  'Danh sách đơn hàng đến hạn xuất kho',
+  {headers:['MÃ HÀNG','SỐ DO','NGÀY XUẤT'],colW:[0.36,0.32,0.32],
+   rows:[['FXP-EP101','5300019159-A','22/08'],['FXP-EP108','5300019159-A','22/08']]});
+const chip2Y=chip1.y+chip1.h+30;
+const chip2=chipWithTable(g,chipX,chip2Y,chipW,'eye','var(--k-pink)','QT5 · THEO DÕI ĐƠN HÀNG XUẤT KHO','Nhận danh sách hàng ngày để theo dõi & lập phiếu',
+  'Danh sách đơn hàng xuất kho hôm nay — từ Sheet bắn về',
+  {headers:['MÃ HÀNG','SỐ DO','NGÀY XUẤT'],colW:[0.36,0.32,0.32],
+   rows:[['FXP-EP101','5300019159-A','22/08'],['FXP-EP108','5300019159-A','22/08']],hi:[2]});
+
+const gs = panelWithTable(g,1200,300,460,'sheet','var(--k-green)','GOOGLE SHEET','Danh sách xuất kho hàng ngày',
+  'Cập nhật mỗi ngày, làm nguồn cho QT5',
+  {headers:['MÃ HÀNG','SỐ DO','NGÀY XUẤT'],colW:[0.36,0.32,0.32],
+   rows:[['FXP-EP101','5300019159-A','22/08'],['FXP-EP108','5300019159-A','22/08']]});
+
+const bx=(chip1.rightX+gs.leftX)/2, by=(chip1.tableMidY+chip2.tableMidY)/2;
+twoWireWithLabel('p1d',g,g1ld,'var(--k-purple)','var(--k-purple)','var(--k-pink)',
+  'n8n · đẩy danh sách đơn hàng xuất kho hôm nay ra Sheet','n8n · Sheet bắn phiếu về QT5 theo danh sách hàng ngày',
+  bx,by,
+  chip1.rightX,chip1.tableMidY, gs.leftX,gs.headerMidY,
+  gs.leftX,gs.tableMidY, chip2.rightX,chip2.tableMidY);
+})();
+const FLOW1D=[['p1d_top','var(--k-purple)',.8],['p1d_bot','var(--k-pink)',.8]];
+const CAPS1D=[
+  ['Luồng 4a','<b>QT1 (Tiếp nhận DO &amp; lên KHSX) → n8n → Google Sheet</b>: tạo <i>danh sách đơn hàng xuất kho hàng ngày</i>, đẩy ra Sheet để tổng hợp.'],
+  ['Luồng 4b','<b>Google Sheet → n8n → QT5 (Theo dõi đơn hàng xuất kho)</b>: Sheet bắn phiếu về QT5 mỗi ngày theo đúng danh sách đơn hàng cần xuất.'],
+];
+
 /* ============================================================
    TRANG 2 — KIẾN TRÚC DỮ LIỆU HIỆN TẠI (giữ đúng bố cục gốc)
    ============================================================ */
@@ -601,11 +638,11 @@ function flowTick(FLOW){
 let ci=0,ct=99,raf=null,last=0;
 function activeFlow(){
   if(curPage==='p2') return FLOW2;
-  return {a:FLOW1A,b:FLOW1B,c:FLOW1C}[curSub];
+  return {a:FLOW1A,b:FLOW1B,c:FLOW1C,d:FLOW1D}[curSub];
 }
 function activeCaps(){
   if(curPage==='p2') return CAPS2;
-  return {a:CAPS1A,b:CAPS1B,c:CAPS1C}[curSub];
+  return {a:CAPS1A,b:CAPS1B,c:CAPS1C,d:CAPS1D}[curSub];
 }
 function tick(ts){
   const dt=Math.min(.05,(ts-last)/1000)||0; last=ts;
@@ -626,7 +663,7 @@ function start(){
 function showSub(s){
   curSub=s;
   document.querySelectorAll('#subnav1 button').forEach(b=>b.classList.toggle('on',b.getAttribute('data-sub')===s));
-  ['a','b','c'].forEach(k=>{
+  ['a','b','c','d'].forEach(k=>{
     const on=(s===k);
     $('lyLines1'+k).classList.toggle('hidden',!on);
     $('ly1'+k).classList.toggle('hidden',!on);
@@ -647,7 +684,7 @@ function showPage(p){
   if(p==='p1'){
     showSub(curSub);
   } else {
-    ['a','b','c'].forEach(k=>{ $('lyLines1'+k).classList.add('hidden'); $('ly1'+k).classList.add('hidden'); });
+    ['a','b','c','d'].forEach(k=>{ $('lyLines1'+k).classList.add('hidden'); $('ly1'+k).classList.add('hidden'); });
   }
   if(isReport){ clearFx(); return; }
   $('pageNote').textContent = p==='p1'
